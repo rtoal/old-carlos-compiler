@@ -1,0 +1,5 @@
+struct T {
+  int a;
+  int b;
+  string a;
+}

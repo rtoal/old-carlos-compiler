@@ -1,0 +1,1 @@
+string[] a = "s"; // Error - Type mismatch

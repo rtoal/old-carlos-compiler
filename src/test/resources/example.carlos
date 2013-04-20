@@ -1,0 +1,15 @@
+// A good "first example" for studying semantics
+
+int x = length(f(2));
+
+string f(int y) {
+    dog z;
+    while (x < y * length(z.name)) {
+        string[] s;
+        print(f(int(z.name[3])));
+    }
+}
+
+struct dog {
+    string name;
+}

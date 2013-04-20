@@ -1,0 +1,11 @@
+struct dog {
+ int a;
+ int b;
+}
+ 
+// Semantic error: Redeclaration of dog
+struct dog { 
+  int a1;
+  int b1;
+}
+

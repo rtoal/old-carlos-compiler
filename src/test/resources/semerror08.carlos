@@ -1,0 +1,5 @@
+// (c) Mark Walker
+
+void main() {
+	i = j >> 1.2; // Semantic error: real operand to '>>'	
+}

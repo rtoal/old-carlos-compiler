@@ -1,0 +1,10 @@
+// (c) Prabhu Anbanathan
+
+void dosomething(char c, int x, int y) {
+    return;   
+}
+
+void main() {
+    // Semantic error: arguments are not in correct order
+    dosomething(5, 7, 'c');
+}

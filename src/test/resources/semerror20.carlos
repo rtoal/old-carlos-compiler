@@ -1,0 +1,11 @@
+void f1() {
+	return;
+}
+
+int f1() {
+	return 0;
+}
+
+f1(); // error - we don't check return types at all.
+
+

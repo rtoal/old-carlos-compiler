@@ -1,0 +1,8 @@
+dog fido = new dog {"brown","4"}; //Error
+
+struct dog {
+  string color;
+  int age;
+}
+
+

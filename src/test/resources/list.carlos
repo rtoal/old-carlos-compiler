@@ -1,0 +1,10 @@
+struct List {
+    string data;
+    List next;
+}
+
+List list;
+
+for (List p = list; p != null; p = p.next) {
+    print p.data;
+}

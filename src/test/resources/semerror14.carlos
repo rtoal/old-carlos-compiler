@@ -1,0 +1,3 @@
+int b;
+string a = "abc" + b;
+	

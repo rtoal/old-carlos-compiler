@@ -1,0 +1,5 @@
+int[] y;
+real p = ln(2.0 * pi() / sqrt(cos(y[2])));
+int x = int(char(44));
+char c = char(int('3'));
+p = atan(y[0], sin(p));

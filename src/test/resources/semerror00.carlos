@@ -1,0 +1,6 @@
+void foo(string x) {}
+
+void main() {
+   void foo(int i) {}
+   foo("dog"); // Semantic error: foo(int) obscures foo(string)
+}

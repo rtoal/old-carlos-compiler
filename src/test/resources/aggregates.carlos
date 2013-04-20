@@ -1,0 +1,18 @@
+// A simple demo using aggregates, empty
+// array constructors, and expressions
+// with array subscripts inside of array
+// subscripts.
+
+real[] a = new real[]{9000, 3000, 2005};
+
+int[] b = new int[3];
+
+struct Point {
+    int x;
+    int y;
+}
+
+Point p = new Point{19, 32};
+
+real z = p.y + a[b[1]];
+

@@ -1,0 +1,100 @@
+// This program contains all syntactic forms
+// and shouldn't have any semantic errors.
+
+int[][] x;
+string s = "ab\34;\n\\\22;\"\'cdefg\EF;h";
+real p = length s;
+char w = char 10;
+int z = int 'z';
+
+struct r4930rtj34gt0_394_____jt3049tj304t9j34 {}
+
+struct date {
+   int year;
+   int month;
+   int day;
+}
+
+while (p < 1.1) {
+}
+
+person f(boolean last) {
+    p = 1.3E7;
+    ++x[1][1];
+    --x[1][1];
+    x[1][1]++;
+    x[1][1]++;
+    last = last || s[3] == '(';
+    return new person{"Ciara", new date{2000, 1, 1}};
+}
+
+struct person {
+    string name;
+    date birthdate;
+}
+
+person functionWithALongName() {
+    dog g(int x, real y) {}
+    string s = p(new dog{"Fido", new dog[]{g(1,0), null}});
+    string p(dog x) {return x.name;}
+    struct dog {string name; dog[] offspring;}
+    char x;
+    print(string(atan(2.1E-4, int('\n'))));
+    string p(int[] q, int y) {}
+    print(g(2,1).offspring[4].offspring[length(g(0,0).name)].name);
+}
+
+string f(int y) {
+    cat z;
+    while (string(x) != z.name) {
+        main();
+        if (length(z.name) == 0) {main();}
+        string[] s;
+        string q(boolean cat) {return null;}
+        print(string(f(~3)));
+        print(string(p * x[3][99 / 2]));
+        s[1] = substring( q(4.0 != sin(cos(ln(sqrt(pi()))))), 0, 0);
+    }
+}
+
+struct cat {
+    string name;
+}
+
+void main() {
+    string s = f("10"=="2").name;
+    while (!true || false && s[1] != '\'') {p = length(f(true).name);}
+    if (int('\'') <= -(~3*6&0^2|9*~8-~9) && true || false) {return;}
+    if (!false || p > 9.3E2) {return;}
+    while (true) {break;}
+    string something() {return substring("345", 0, 1);}
+    if (true) {}
+    if (true) {} else if (p == 1) {}
+    if (true) {} else if (false) {} else if (false) {}
+    if (true) {} else if (false) {} else if (false) {} else {s = "xx";}
+    string i = string(int(char(22)));
+    for (;;) {}
+    for (string p = ""; p != "";) {}
+    for (int i = 0;  i < 2; i++) {
+        int x = i;
+        i = (4 << 5 >> ~i) + ++i + --i + i++ * i-- - -i;
+    }
+    if (2 % length(i) > 0 && (0 <= x[4][2])) {i = "dog";}
+    cat[] cats = new cat[]{null, null};
+    i = "it is still a string out here";
+    void f00001(int i) {i = 2;}
+    i = "string again";
+    void f00002() {int i = 2;}
+    i = "string again";
+    while (true) {
+        void f00002() {int i = 2;}
+        break;
+    }
+    if (i[0] > 'c' || i[0] < 'c' || i[1] <= 'c' || i[1] >= 'c') {}
+    cat c1;
+    cat c2;
+    boolean test = c1 == c2 || c1 != c2 && c1.name == getString();
+}
+
+string[] q = new string[]{"one", "three", "four"};
+q[1] = substring(q[1], 2, 1);

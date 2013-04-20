@@ -1,0 +1,9 @@
+void main() {
+
+   int test() {
+      int y = 5;
+      return y;
+   }
+
+   y = 6;  // Semantic error: y is an undeclared identifier
+}

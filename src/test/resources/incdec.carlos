@@ -1,0 +1,20 @@
+int x = 100;
+int[] a;
+
+// Statements
+
+x++;
+x--;
+++x;
+--x;
+
+a[4]++;
+
+// Expressions
+
+int y = x++;
+print x++;
+y = x--;
+
+y = a[x]++;
+

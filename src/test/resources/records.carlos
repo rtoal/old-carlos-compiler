@@ -1,0 +1,22 @@
+struct date {
+    int month;
+    int date;
+    int year;
+}
+
+struct person {
+    string name;
+    real height;
+    date birthday;
+}
+
+struct group {
+    string name;
+    person[] members;
+}
+
+person p = new person{"Sue", 70.0, new date{8, 18, 1990}};
+
+group[] groups = new group[100];
+
+print groups[40].members[5].birthday.year;

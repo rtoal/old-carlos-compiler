@@ -1,0 +1,12 @@
+// (c) Mark Walker
+
+void main() {
+	boolean a = true;
+	boolean b = false;
+	int i = 1;
+	int j = 9;
+	real x = 0.2;
+	real y = -56.2;
+	string s = "test";
+	i = j << 1.2;	    // Semantic error: real operand for '<<'
+}

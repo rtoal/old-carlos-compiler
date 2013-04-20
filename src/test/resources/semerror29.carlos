@@ -1,0 +1,7 @@
+string f() {
+    while (true) {
+        void g() {
+            break;  // Error - this isn't REALLY in a loop
+        }
+    }
+}

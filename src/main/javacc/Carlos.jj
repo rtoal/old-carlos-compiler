@@ -1,0 +1,567 @@
+/*
+ *  Carlos.jj
+ *
+ *  Carlos specification for JavaCC.
+ */
+
+// ---------------------------------------------------------------------------
+// GLOBAL OPTIONS
+// ---------------------------------------------------------------------------
+
+options {
+  UNICODE_INPUT = true;
+  STATIC = false;
+}
+
+// ---------------------------------------------------------------------------
+// THE PARSER CLASS
+// ---------------------------------------------------------------------------
+
+PARSER_BEGIN(Parser)
+
+package edu.lmu.cs.xlg.carlos.syntax;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.io.Reader;
+import edu.lmu.cs.xlg.util.Log;
+import edu.lmu.cs.xlg.carlos.entities.*;
+
+public class Parser {
+    public Program parse(Reader reader, Log log) {
+        try {
+            return parseProgram();
+        } catch (TokenMgrError e) {
+            log.exception(e);
+            return null;
+        } catch (ParseException e) {
+            log.exception(e);
+            return null;
+        }
+    }
+}
+
+PARSER_END(Parser)
+
+// ---------------------------------------------------------------------------
+// LEXICAL ANALYZER
+// ---------------------------------------------------------------------------
+
+// Whitespace and comments
+
+SKIP: {
+    " " | "\t" | "\n" | "\r" | <"//" (~["\n","\r"])* ("\n"|"\r")>
+}
+
+// Reserved Words and symbols
+
+TOKEN: {
+   "boolean"  |  "if"      |  "break"   |  "else"   |  "int"    |  "for"
+|  "return"   |  "char"    |  "struct"  |  "null"   |  "while"  |  "real"
+|  "true"     |  "string"  |  "void"    |  "false"  |  "new"    |  "length"
+|  "print"
+
+|  "."   |   ","    |   ";"
+|  "("   |   ")"    |  "["    |  "]"    |  "{"   |  "}"
+|  "="
+|  "=="  |   "!="   |  "<"    |  "<="   |  ">"   |  ">="
+|  "||"  |   "&&"   |  "!"
+|  "+"   |   "-"    |  "*"    |  "/"    |  "%"
+|  "|"   |   "^"    |  "&"    |  "~"    |  "<<"  |  ">>"
+|  "++"  |   "--"
+}
+
+// Literals
+
+TOKEN: {
+    < INTLIT: (["0"-"9"])+ >
+|
+    < FLOATLIT: (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? >
+|
+    < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+    < CHARLIT:
+        "'"
+        (
+            ~["'", "\\" ,"\u0000"-"\u001f", "\u007f"-"\u009f"]
+        |
+            "\\" ( ["n", "t", "\\", "'", "\""] | <UNICODE_SPEC> )
+        )
+        "'"
+    >
+|
+    < STRINGLIT:
+        "\""
+        (
+            ~["\"", "\\" ,"\u0000"-"\u001f", "\u007f"-"\u009f"]
+        |
+            "\\" ( ["n", "t", "\\", "'", "\""] | <UNICODE_SPEC> )
+        )*
+        "\""
+    >
+|
+    < #UNICODE_SPEC:
+        (<HEX>)(<HEX>)?(<HEX>)?(<HEX>)?(<HEX>)?(<HEX>)?(<HEX>)?(<HEX>)? ";"
+    >
+|
+    < #HEX: ["0"-"9", "A"-"F", "a"-"f"] >
+|
+    < ID: <LETTER> (<LETTER>|<DIGIT>|"_")* >
+|
+    < #LETTER: [
+        "\u0041"-"\u005a", "\u0061"-"\u007a", "\u00c0"-"\u00d6",
+        "\u00d8"-"\u00f6", "\u00f8"-"\u00ff", "\u0100"-"\u1fff",
+        "\u3040"-"\u318f", "\u3300"-"\u337f", "\u3400"-"\u3d2d",
+        "\u4e00"-"\u9fff", "\uf900"-"\ufaff"
+    ] >
+|
+    < #DIGIT: [
+        "\u0030"-"\u0039", "\u0660"-"\u0669", "\u06f0"-"\u06f9",
+        "\u0966"-"\u096f", "\u09e6"-"\u09ef", "\u0a66"-"\u0a6f",
+        "\u0ae6"-"\u0aef", "\u0b66"-"\u0b6f", "\u0be7"-"\u0bef",
+        "\u0c66"-"\u0c6f", "\u0ce6"-"\u0cef", "\u0d66"-"\u0d6f",
+        "\u0e50"-"\u0e59", "\u0ed0"-"\u0ed9", "\u1040"-"\u1049"
+    ] >
+}
+
+// ---------------------------------------------------------------------------
+// SYNTAX ANALYZER
+// ---------------------------------------------------------------------------
+
+Program parseProgram(): {
+    List<Statement> statements = new ArrayList<Statement>();
+    Statement s;
+}{
+    ( s = parseStmt() {statements.add(s);} )+
+    <EOF>
+    {return new Program(statements);}
+}
+
+Declarable parseDec(): {
+    Declarable d;
+}{
+    (
+        d = parseTypeDec()
+    |
+        LOOKAHEAD( (parseType() | "void") <ID> "(" )
+        d = parseFunDec()
+    |
+        d = parseVarDec()
+    )
+    {return d;}
+}
+
+Type parseTypeDec(): {
+    Token s;
+    String t;
+    Token f;
+    List<StructField> fields = new ArrayList<StructField>();
+}{
+    "struct" s = <ID>
+    "{"
+    (
+        t = parseType() f = <ID> ";"
+        {fields.add(new StructField(f.image, t));}
+    )*
+    "}"
+    {return new StructType(s.image, fields);}
+}
+
+String parseType(): {
+    Token i;
+    StringBuilder builder = new StringBuilder();
+}{
+    (
+        i = "boolean"
+    |
+        i = "char"
+    |
+        i = "int"
+    |
+        i = "real"
+    |
+        i = "string"
+    |
+        i = <ID>
+    )
+    {builder.append(i.image);}
+    (
+        LOOKAHEAD(2) "[" "]" {builder.append("[]");}
+    )*
+    {return builder.toString();}
+}
+
+Variable parseVarDec(): {
+    String t;
+    Token v;
+    Expression e = null;
+}{
+    t = parseType() v = <ID> ("=" e = parseExp())? ";"
+    {return new Variable(v.image, t, e);}
+}
+
+Function parseFunDec(): {
+    String r;
+    Token n;
+    String t;
+    Token p;
+    List<Variable> params = new ArrayList<Variable>();
+    Block body;
+}{
+    (r = parseType() | "void" {r = "void";})
+    n = <ID>
+    "("
+    (
+        t = parseType() p = <ID>
+        {params.add(new Variable(p.image, t, null));}
+        (
+            LOOKAHEAD(2) "," t = parseType() p = <ID>
+            {params.add(new Variable(p.image, t, null));}
+        )*
+    )?
+    ")"
+    body = parseBlock()
+    {return new Function(r, n.image, params, body);}
+}
+
+Block parseBlock(): {
+    List<Statement> statements = new ArrayList<Statement>();
+    Statement s;
+}{
+    "{"
+    ( s = parseStmt() {statements.add(s);} )*
+    "}"
+    {return new Block(statements);}
+}
+
+Statement parseStmt(): {
+    Declarable d;
+    Expression e = null, e1 = null, e2 = null;
+    Statement s = null;
+    Block b = null;
+    Token i = null;
+    String t = null;
+    List<Expression> args = new ArrayList<Expression>();
+    List<Case> cases = new ArrayList<Case>();
+}{
+    LOOKAHEAD(parseDec()) d = parseDec()
+    {return new Declaration(d);}
+|
+    LOOKAHEAD(parseIncop() | parseVar() (parseIncop() | "="))
+    s = parseAssignment() ";"
+    {return s;}
+|
+    s = parseCallStatement() ";"
+    {return s;}
+|
+    "break" ";"
+    {return new BreakStatement();}
+|
+    "return" (e = parseExp())? ";"
+    {return new ReturnStatement(e);}
+|
+    "print" (args = parseArgs()) ";"
+    {return new PrintStatement(args);}
+|
+    "if" "(" e = parseExp() ")" b = parseBlock()
+    {cases.add(new Case(e, b));}
+    (
+        LOOKAHEAD(2) "else" "if" "(" e = parseExp() ")" b = parseBlock()
+        {cases.add(new Case(e, b));}
+    )*
+    (
+        "else" b = parseBlock()
+        {cases.add(new Case(BooleanLiteral.TRUE, b));}
+    )?
+    {return new IfStatement(cases);}
+|
+    "while" "(" e = parseExp() ")" b = parseBlock()
+    {return new WhileStatement(e, b);}
+|
+    LOOKAHEAD(2) "for" "("
+    (t = parseType() i = <ID> "=" e1 = parseExp())? ";"
+    (e2 = parseExp())? ";"
+    (s = parseAssignment())?
+    ")"
+    b = parseBlock()
+    {return new ClassicForStatement(t, i==null?null:i.image, e1, e2, s, b);}
+}
+
+Statement parseAssignment(): {
+    VariableExpression v;
+    Expression e = null;
+    Statement s;
+}{
+    LOOKAHEAD(parseIncop() | parseVar() parseIncop())
+    s = parseIncrementStatement()
+    {return s;}
+|
+    v = parseVar() "=" e = parseExp()
+    {return new AssignmentStatement(v, e);}
+}
+
+Statement parseIncrementStatement(): {
+    String op;
+    VariableExpression v;
+}{
+    (
+        op=parseIncop() v = parseVar()
+    |
+        v = parseVar() op = parseIncop()
+    )
+    {return new IncrementStatement(v, op);}
+}
+
+Statement parseCallStatement(): {
+    Token i;
+    List<Expression> args;
+}{
+    i = <ID> "(" args = parseArgs() ")"
+    {return new CallStatement(i.image, args);}
+}
+
+Expression parseExp(): {
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp1()
+    ("||" e2 = parseExp1() {e1 = new InfixExpression(e1, "||", e2);})*
+    {return e1;}
+}
+
+Expression parseExp1(): {
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp2()
+    ("&&" e2 = parseExp2() {e1 = new InfixExpression(e1, "&&", e2);})*
+    {return e1;}
+}
+
+Expression parseExp2(): {
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp3()
+    ("|" e2 = parseExp3() {e1 = new InfixExpression(e1, "|", e2);})*
+    {return e1;}
+}
+
+Expression parseExp3(): {
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp4()
+    ("^" e2 = parseExp4() {e1 = new InfixExpression(e1, "^", e2);})*
+    {return e1;}
+}
+
+Expression parseExp4(): {
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp5()
+    ("&" e2 = parseExp5() {e1 = new InfixExpression(e1, "&", e2);})*
+    {return e1;}
+}
+
+Expression parseExp5(): {
+    String op;
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp6()
+    (op = parseRelop() e2 = parseExp6() {e1 = new InfixExpression(e1, op, e2);})?
+    {return e1;}
+}
+
+Expression parseExp6(): {
+    String op;
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp7()
+    (op = parseShiftop() e2 = parseExp7() {e1 = new InfixExpression(e1, op, e2);})*
+    {return e1;}
+}
+
+Expression parseExp7(): {
+    String op;
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp8()
+    (op = parseAddop() e2 = parseExp8() {e1 = new InfixExpression(e1, op, e2);})*
+    {return e1;}
+}
+
+Expression parseExp8(): {
+    String op;
+    Expression e1;
+    Expression e2;
+}{
+    e1 = parseExp9()
+    (op = parseMulop() e2 = parseExp9() {e1 = new InfixExpression(e1, op, e2);})*
+    {return e1;}
+}
+
+Expression parseExp9(): {
+    String op = null;
+    Expression e;
+}{
+    (op = parsePrefixop())? e = parseExp10()
+    {return op == null ? e : new PrefixExpression(op, e);}
+}
+
+Expression parseExp10(): {
+    Expression e;
+}{
+    LOOKAHEAD(2) e = parseLiteral()
+    {return e;}
+|
+    LOOKAHEAD(parseIncrementExpression()) e = parseIncrementExpression()
+    {return e;}
+|
+    e = parseVar()
+    {return e;}
+|
+    e = parseNewObject()
+    {return e;}
+|
+    "(" e = parseExp() ")"
+    {return e;}
+}
+
+Literal parseLiteral(): {
+    Token i;
+}{
+    "null" {return Literal.NULL;}
+|
+    "true" {return BooleanLiteral.TRUE;}
+|
+    "false" {return BooleanLiteral.FALSE;}
+|
+    i=<INTLIT> {return new IntegerLiteral(i.image);}
+|
+    i=<FLOATLIT> {return new RealLiteral(i.image);}
+|
+    i=<CHARLIT> {return new CharLiteral(i.image);}
+|
+    i=<STRINGLIT> {return new StringLiteral(i.image);}
+}
+
+VariableExpression parseVar(): {
+    VariableExpression v;
+    Expression e =  null;
+    Token i;
+}{
+    (
+        LOOKAHEAD(2) v = parseCallExpression()
+    |
+        i = <ID>
+        {v = new SimpleVariableReference(i.image);}
+    )
+    (
+        "[" e = parseExp() "]"
+        {v = new SubscriptedVariable(v, e);}
+    |
+        "." i = <ID>
+        {v = new DottedVariable(v, i.image);}
+    )*
+    {return v;}
+}
+
+Expression parseIncrementExpression(): {
+    String op;
+    VariableExpression v;
+}{
+    op = parseIncop() v = parseVar()
+    {return new PrefixExpression(op, v);}
+|
+    v = parseVar() op = parseIncop()
+    {return new PostfixExpression(v, op);}
+}
+
+Expression parseNewObject(): {
+    String t;
+    List<Expression> args;
+    Expression e;
+    Token i;
+    List<Expression> bounds = new ArrayList<Expression>();
+}{
+    "new"
+    (
+        LOOKAHEAD(<ID> "{") i = <ID> "{" args = parseArgs() "}"
+        {return new StructAggregate(i.image, args);}
+    |
+        t = parseType()
+        (
+            "{" args = parseArgs() "}"
+            {return new ArrayAggregate(t, args);}
+        |
+            ("[" e = parseExp() "]" {bounds.add(e);})+
+            {return new EmptyArray(t, bounds);}
+        )
+    )
+}
+
+VariableExpression parseCallExpression(): {
+    Token i;
+    List<Expression> args;
+}{
+    i = <ID> "(" args = parseArgs() ")"
+    {return new CallExpression(i.image, args);}
+}
+
+List<Expression> parseArgs(): {
+    List<Expression> args = new ArrayList<Expression>();
+    Expression e;
+}{
+    (
+        e = parseExp() {args.add(e);}
+        ("," e = parseExp() {args.add(e);})*
+    )?
+    {return args;}
+}
+
+String parseRelop(): {
+    Token i;
+}{
+    (i = "<" | i = "<=" | i = "==" | i = "!=" | i = ">=" | i = ">")
+    {return i.image;}
+}
+
+String parseShiftop(): {
+    Token i;
+}{
+    (i = "<<" | i = ">>")
+    {return i.image;}
+}
+
+String parseAddop(): {
+    Token i;
+}{
+    (i = "+" | i = "-")
+    {return i.image;}
+}
+
+String parseMulop(): {
+    Token i;
+}{
+    (i = "*" | i = "/" | i = "%")
+    {return i.image;}
+}
+
+String parsePrefixop(): {
+    Token i;
+}{
+    (i = "-" | i = "!" | i = "~" | i = "int" | i = "char" | i = "string" | i = "length")
+    {return i.image;}
+}
+
+String parseIncop(): {
+    Token i;
+}{
+    (i = "++" | i = "--")
+    {return i.image;}
+}

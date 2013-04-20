@@ -1,0 +1,5 @@
+dog f(int x) {}
+string s = p(new dog{p(null, 1), new dog[]{f(1), null}});
+string p(dog x) {return string(length(x.name) + 9);}
+struct dog {string name; dog[] offspring;}
+string p(int[] q, int y) {}

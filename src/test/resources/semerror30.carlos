@@ -1,0 +1,2 @@
+struct s{int x; char y; string z;}
+s a = new s{4, 'd'};  // Semantic error: not enough fields

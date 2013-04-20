@@ -1,0 +1,3 @@
+int i = 1;
+string s = "test";
+void f() {if (i == s) {}} // Semantic Error	

@@ -1,0 +1,4 @@
+void f() {
+    struct s {}
+    int s = 1;    // Error: s redeclared
+}

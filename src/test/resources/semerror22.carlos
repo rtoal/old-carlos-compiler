@@ -1,0 +1,9 @@
+void f(int a, string s) {
+    return;	
+}
+
+void f(int a, int[] b) {
+    return;
+}
+
+f(8, null); // semantic error

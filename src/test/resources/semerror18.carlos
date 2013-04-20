@@ -1,0 +1,4 @@
+int b;
+void f1(int c){
+   int c;// Error-- Duplicate definition
+}   

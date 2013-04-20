@@ -1,0 +1,7 @@
+void f1() {
+    int i;
+    return i; // ERROR
+}
+
+void f2() {return;}
+

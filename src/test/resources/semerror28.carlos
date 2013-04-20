@@ -1,0 +1,4 @@
+void f() {
+    void g() {}
+    int x = g() + 7; // Error g() is void
+}

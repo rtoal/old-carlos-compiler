@@ -1,0 +1,2 @@
+// Wrong argument types for substring
+string y = substring("abc", 1);

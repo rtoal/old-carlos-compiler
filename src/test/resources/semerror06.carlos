@@ -1,0 +1,6 @@
+// (c) James Turner
+
+// Semantic error: real instead of int in array initializer
+
+int[] x = new int[]{ 1, 2, 3.0 };  
+

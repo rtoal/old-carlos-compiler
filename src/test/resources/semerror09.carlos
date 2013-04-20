@@ -1,0 +1,6 @@
+// (c) Mark Walker
+
+void main() {
+	boolean a;	
+	a = 5;	   // Semantic error: int assigned to boolean
+}

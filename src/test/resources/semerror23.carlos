@@ -1,0 +1,7 @@
+void f4(int a, real b, char c) {
+	return;	
+}
+
+void f4(int a, int a, char x) { // Semantic error
+	return;
+}

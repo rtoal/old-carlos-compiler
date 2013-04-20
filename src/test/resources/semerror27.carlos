@@ -1,0 +1,4 @@
+void f() {
+    int s = 1;
+    s x;         // Error: s is not a type
+}

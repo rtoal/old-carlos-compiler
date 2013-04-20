@@ -1,0 +1,4 @@
+void f(int a, int a) {  // Semantic error, a redeclared
+    a = 2;
+}
+

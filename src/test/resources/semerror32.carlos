@@ -1,0 +1,2 @@
+struct s {int x;}
+s a = new s{4.5};

@@ -1,0 +1,3 @@
+int a;
+string b;
+int a = -b; // Semantic Error: b must be an arithmetic type

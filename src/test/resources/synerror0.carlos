@@ -1,0 +1,3 @@
+void f() {
+    int Kaua`i; // Lexical error, no "`"
+}
