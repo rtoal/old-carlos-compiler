@@ -39,6 +39,6 @@ public class StructField extends Entity {
      * Analyzes this field, checking that type indicated by the typename exists.
      */
     public void analyze(AnalysisContext context) {
-        type = context.getTable().lookupType(typename, context.getLog());
+        type = context.lookupType(typename);
     }
 }

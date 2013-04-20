@@ -50,7 +50,7 @@ public class StructAggregate extends Expression {
             Expression a = ai.next();
             StructField f = fi.next();
             a.analyze(context);
-            a.assertAssignableTo(f.getType(), context.getLog(), "sagg_type_error");
+            a.assertAssignableTo(f.getType(), context, "sagg_type_error");
         }
     }
 }

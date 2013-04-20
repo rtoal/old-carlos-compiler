@@ -24,9 +24,7 @@ public class Case extends Entity {
     @Override
     public void analyze(AnalysisContext context) {
         condition.analyze(context);
-        if (condition.type != Type.BOOLEAN) {
-            context.getLog().error("if_condition_not_boolean");
-        }
+        condition.assertBoolean("if_statement_condition", context);
         body.analyze(context);
     }
 }

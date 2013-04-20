@@ -36,7 +36,7 @@ public class ArrayAggregate extends Expression {
      */
     @Override
     public void analyze(AnalysisContext context) {
-        type = context.getTable().lookupType(typename, context.getLog());
+        type = context.lookupType(typename);
         if (! (type instanceof ArrayType)) {
             context.getLog().error("illegal_aggregate_type", type.getName());
             return;
@@ -45,7 +45,7 @@ public class ArrayAggregate extends Expression {
         Type elementType = ArrayType.class.cast(type).getBaseType();
         for (Expression a: args) {
             a.analyze(context);
-            a.assertAssignableTo(elementType, context.getLog(), "aagg_type_error");
+            a.assertAssignableTo(elementType, context, "aagg_type_error");
         }
     }
 }

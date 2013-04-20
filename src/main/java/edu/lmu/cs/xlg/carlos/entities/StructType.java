@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.lmu.cs.xlg.util.Log;
-
 /**
  * A type which is a struct.
  */
@@ -22,11 +20,6 @@ public class StructType extends Type {
         return fields;
     }
 
-    /**
-     * Analyzes this type.  First check that all field names
-     * are unique.  Then check that every field declaration
-     * has a valid type.
-     */
     @Override
     public void analyze(AnalysisContext context) {
         Set<String> fieldNames = new HashSet<String>();
@@ -45,7 +38,7 @@ public class StructType extends Type {
      * Returns the field in this type with the given name.  If no
      * such field exists, log an error and return an "arbitrary" field.
      */
-    public StructField getField(String fieldName, Log log) {
+    public StructField getField(String fieldName, AnalysisContext context) {
         for (StructField field: fields) {
             if (field.getName().equals(fieldName)) {
                 return field;
@@ -53,7 +46,7 @@ public class StructType extends Type {
         }
 
         // Didn't find it, use the placeholder.
-        log.error("no_such_field", this.getName(), fieldName);
+        context.getLog().error("no_such_field", this.getName(), fieldName);
         return StructField.ARBITRARY;
     }
 }

@@ -24,8 +24,8 @@ public class PostfixExpression extends Expression {
     @Override
     public void analyze(AnalysisContext context) {
         operand.analyze(context);
-        operand.assertInteger(op, context.getLog());
-        operand.assertWritable(context.getLog());
+        operand.assertInteger(op, context);
+        operand.assertWritable(context);
         type = Type.INT;
    }
 }

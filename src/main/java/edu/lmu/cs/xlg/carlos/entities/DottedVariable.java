@@ -39,7 +39,7 @@ public class DottedVariable extends VariableExpression {
             context.getLog().error("not_a_struct");
             type = Type.ARBITRARY;
         } else {
-            field = ((StructType)struct.type).getField(fieldName, context.getLog());
+            field = ((StructType)struct.type).getField(fieldName, context);
 
             // The type of the dotted variable is the type of the field.
             type = field.getType();

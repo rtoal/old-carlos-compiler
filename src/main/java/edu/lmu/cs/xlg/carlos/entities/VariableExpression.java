@@ -1,11 +1,9 @@
 package edu.lmu.cs.xlg.carlos.entities;
 
-import edu.lmu.cs.xlg.util.Log;
-
 /**
- * Superclass for all variable expressions. There are several kinds of variable expressions: simple variable
- * references (a single id), subscripted variable expressions for arrays and strings (v[e]), dotted variable
- * expressions (v.i), and function call results.
+ * Superclass for all variable expressions. There are several kinds of variable expressions: simple
+ * variable references (a single id), subscripted variable expressions for arrays and strings (v[e]),
+ * dotted variable expressions (v.i), and function call results.
  */
 public abstract class VariableExpression extends Expression {
 
@@ -17,9 +15,9 @@ public abstract class VariableExpression extends Expression {
     /**
      * Logs an error if the variable expression denotes a read-only variable.
      */
-    public void assertWritable(Log log) {
+    public void assertWritable(AnalysisContext context) {
         if (!isWritable()) {
-            log.error("read_only_error");
+            context.getLog().error("read_only_error");
         }
     }
 }

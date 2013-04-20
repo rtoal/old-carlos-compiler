@@ -299,6 +299,10 @@ public abstract class Entity {
         public boolean isInLoop() {
             return inLoop;
         }
+
+        public Type lookupType(String name) {
+            return getTable().lookupType(name, getLog());
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ public class WhileStatement extends Statement {
     @Override
     public void analyze(AnalysisContext context) {
         condition.analyze(context);
-        condition.assertBoolean("while_condition_not_boolean", context.getLog());
+        condition.assertBoolean("while_statement_condition", context);
         body.analyze(context.withInLoop(true));
     }
 }

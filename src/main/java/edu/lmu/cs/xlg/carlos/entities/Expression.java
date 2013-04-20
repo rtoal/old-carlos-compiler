@@ -1,7 +1,5 @@
 package edu.lmu.cs.xlg.carlos.entities;
 
-import edu.lmu.cs.xlg.util.Log;
-
 /**
  * Superclass for all expressions.
  */
@@ -14,8 +12,8 @@ public abstract class Expression extends Entity {
     }
 
     /**
-     * Returns whether this expression is compatible with (that is, "can
-     * be assigned to an object of") a given type.
+     * Returns whether this expression is compatible with (that is, "can be assigned to an object
+     * of") a given type.
      */
     public boolean isCompatibleWith(Type testType) {
         return this.type == testType
@@ -27,54 +25,54 @@ public abstract class Expression extends Entity {
             || testType == Type.ARBITRARY;
     }
 
-    // Helpers for semantic analysis, called from the analyze methods of other expressions.
-    // These are by no means necessary, but they are very convenient.
+    // Helpers for semantic analysis, called from the analyze methods of other expressions.  These
+    // are by no means necessary, but they are very convenient.
 
-    void assertAssignableTo(Type otherType, Log log, String errorKey) {
+    void assertAssignableTo(Type otherType, AnalysisContext context, String errorKey) {
         if (!this.isCompatibleWith(otherType)) {
-            log.error(errorKey, otherType.getName(), this.type.getName());
+            context.getLog().error(errorKey, otherType.getName(), this.type.getName());
         }
     }
 
-    void assertArithmetic(String context, Log log) {
+    void assertArithmetic(String operator, AnalysisContext context) {
         if (!(type == Type.INT || type == Type.REAL)) {
-            log.error("non_arithmetic", context);
+            context.getLog().error("non_arithmetic", operator);
         }
     }
 
-    void assertInteger(String context, Log log) {
+    void assertInteger(String operator, AnalysisContext context) {
         if (!(type == Type.INT)) {
-            log.error("non_integer", context);
+            context.getLog().error("non_integer", operator);
         }
     }
 
-    void assertBoolean(String context, Log log) {
+    void assertBoolean(String operator, AnalysisContext context) {
         if (!(type == Type.BOOLEAN)) {
-            log.error("non_boolean", context);
+            context.getLog().error("non_boolean", operator);
         }
     }
 
-    void assertChar(String context, Log log) {
+    void assertChar(String operator, AnalysisContext context) {
         if (!(type == Type.CHAR)) {
-            log.error("non_char", context);
+            context.getLog().error("non_char", operator);
         }
     }
 
-    void assertArray(String context, Log log) {
+    void assertArray(String operator, AnalysisContext context) {
         if (!(type instanceof ArrayType)) {
-            log.error("non_array", context);
+            context.getLog().error("non_array", operator);
         }
     }
 
-    void assertString(String context, Log log) {
+    void assertString(String operator, AnalysisContext context) {
         if (!(type == Type.STRING)) {
-            log.error("non_string", context);
+            context.getLog().error("non_string", operator);
         }
     }
 
-    void assertArrayOrString(String context, Log log) {
+    void assertArrayOrString(String operator, AnalysisContext context) {
         if (!(type == Type.STRING || type instanceof ArrayType)) {
-            log.error("non_array_or_string", context);
+            context.getLog().error("non_array_or_string", operator);
         }
     }
 }

@@ -36,7 +36,7 @@ public class EmptyArray extends Expression {
 
         for (Expression bound: bounds) {
             bound.analyze(context);
-            bound.assertInteger("[]", context.getLog());
+            bound.assertInteger("[]", context);
             type = type.array();
         }
     }

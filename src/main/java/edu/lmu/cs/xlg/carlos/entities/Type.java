@@ -12,10 +12,9 @@ public class Type extends Declarable {
     public static final Type STRING = new Type("string");
 
     /**
-     * A type representing the union of all types.  It is assigned to
-     * an entity whose typename is not in scope.  It is compatible with
-     * all other types.  It exists to avoid spurious errors during
-     * compilation.
+     * A type representing the union of all types.  It is assigned to an entity whose typename
+     * is not in scope.  It is compatible with all other types.  It exists to avoid spurious
+     * errors during compilation.
      */
     public static final Type ARBITRARY = new Type("<arbitrary>");
 
@@ -25,26 +24,21 @@ public class Type extends Declarable {
     public static final Type NULL_TYPE = new Type("<type_of_null>");
 
     /**
-     * A type representing the union of the string type and all
-     * array types.  This is used for the parameter of the special
-     * length function from the standard library.
+     * A type representing the union of the string type and all array types.  This is used for
+     * the parameter of the special length function from the standard library.
      */
     public static final Type ARRAY_OR_STRING = new Type("<array_or_string>");
 
-    // The type which is an array of this type.  It will be null
-    // unless needed.  When it is needed, it will be created.
+    /**
+     * The type which is an array of this type.  It will be null unless needed.  When it is
+     * needed, it will be created.
+     */
     private ArrayType arrayOfThisType = null;
 
-    /**
-     * Constructs a type with the given name.
-     */
     Type(String name) {
         super(name);
     }
 
-    /**
-     * Returns whether this type is a reference type.
-     */
     public boolean isReference() {
         return this == STRING
             || this instanceof ArrayType
@@ -53,9 +47,6 @@ public class Type extends Declarable {
             || this == ARBITRARY;
     }
 
-    /**
-     * Returns whether this type is an arithmetic type.
-     */
     public boolean isArithmetic() {
         return this == INT || this == REAL;
     }
@@ -69,8 +60,7 @@ public class Type extends Declarable {
     }
 
     /**
-     * Returns the type that is an array of this type, lazily
-     * creating it.
+     * Returns the type that is an array of this type, lazily creating it.
      */
     public Type array() {
         if (arrayOfThisType == null) {
@@ -81,9 +71,7 @@ public class Type extends Declarable {
 
     @Override
     public void analyze(AnalysisContext context) {
-        // Intentionally empty
-        // TODO this kinda sucks
-
+        // Intentionally empty - here only because it's nice to have primitives be of this class.
+        // The subclasses ArrayType and StructType still need to override this.
     }
-
 }

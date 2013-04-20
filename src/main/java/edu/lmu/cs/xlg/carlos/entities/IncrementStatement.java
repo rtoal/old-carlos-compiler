@@ -26,6 +26,6 @@ public class IncrementStatement extends Statement {
     @Override
     public void analyze(AnalysisContext context) {
         target.analyze(context);
-        target.assertInteger(op, context.getLog());
+        target.assertInteger(op, context);
     }
 }

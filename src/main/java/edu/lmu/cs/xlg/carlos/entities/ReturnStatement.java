@@ -34,7 +34,7 @@ public class ReturnStatement extends Statement {
         } else {
             // Returning something from a function, so typecheck
             returnExpression.analyze(context);
-            returnExpression.assertAssignableTo(context.getFunction().getReturnType(), context.getLog(),
+            returnExpression.assertAssignableTo(context.getFunction().getReturnType(), context,
                 "return_type_error");
         }
     }

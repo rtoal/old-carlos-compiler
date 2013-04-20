@@ -35,26 +35,26 @@ public class InfixExpression extends Expression {
 
         // num op num (for arithmetic op)
         if (op.matches("\\+|-|\\*|/")) {
-            left.assertArithmetic(op, context.getLog());
-            right.assertArithmetic(op, context.getLog());
+            left.assertArithmetic(op, context);
+            right.assertArithmetic(op, context);
             type = (left.type == Type.REAL || right.type == Type.REAL)
                 ? Type.REAL : Type.INT;
 
         // int op int (for shift, mod, or bitwise op)
         } else if (op.matches("%|<<|>>|&|\\||\\^")) {
-            left.assertInteger(op, context.getLog());
-            right.assertInteger(op, context.getLog());
+            left.assertInteger(op, context);
+            right.assertInteger(op, context);
             type = Type.INT;
 
         // char/num/str op char/num/str (for inequalities except !=)
         } else if (op.matches("<|<=|>|>=")) {
             if (left.type == Type.CHAR) {
-                right.assertChar(op, context.getLog());
+                right.assertChar(op, context);
             } else if (left.type == Type.STRING) {
-                right.assertString(op, context.getLog());
+                right.assertString(op, context);
             } else if (left.type.isArithmetic()){
-                left.assertArithmetic(op, context.getLog());
-                right.assertArithmetic(op, context.getLog());
+                left.assertArithmetic(op, context);
+                right.assertArithmetic(op, context);
             }
             type = Type.BOOLEAN;
 
@@ -70,8 +70,8 @@ public class InfixExpression extends Expression {
         // bool && bool
         // bool || bool
         } else if (op.matches("&&|\\|\\|")) {
-            left.assertBoolean(op, context.getLog());
-            right.assertBoolean(op, context.getLog());
+            left.assertBoolean(op, context);
+            right.assertBoolean(op, context);
             type = Type.BOOLEAN;
         }
     }

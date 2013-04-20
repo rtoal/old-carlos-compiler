@@ -26,8 +26,8 @@ public class SubscriptedVariable extends VariableExpression {
         sequence.analyze(context);
         index.analyze(context);
 
-        sequence.assertArrayOrString("[]", context.getLog());
-        index.assertInteger("[]", context.getLog());
+        sequence.assertArrayOrString("[]", context);
+        index.assertInteger("[]", context);
         type = (sequence.type.isString()) ? Type.CHAR
                 : sequence.type.isArray() ? ArrayType.class.cast(sequence.type).getBaseType()
                 : Type.ARBITRARY;

@@ -26,35 +26,35 @@ public class PrefixExpression extends Expression {
         operand.analyze(context);
 
         if ("!".equals(op)) {
-            operand.assertBoolean(op, context.getLog());
+            operand.assertBoolean(op, context);
             type = Type.BOOLEAN;
 
         } else if ("-".equals(op)) {
-            operand.assertArithmetic(op, context.getLog());
+            operand.assertArithmetic(op, context);
             type = operand.type;
 
         } else if ("~".equals(op)) {
-            operand.assertInteger(op, context.getLog());
+            operand.assertInteger(op, context);
             type = Type.INT;
 
         } else if ("int".equals(op)) {
-            operand.assertChar(op, context.getLog());
+            operand.assertChar(op, context);
             type = Type.INT;
 
         } else if ("char".equals(op)) {
-            operand.assertInteger(op, context.getLog());
+            operand.assertInteger(op, context);
             type = Type.CHAR;
 
         } else if ("string".equals(op)) {
             type = Type.STRING;
 
         } else if ("length".equals(op)) {
-            operand.assertArrayOrString(op, context.getLog());
+            operand.assertArrayOrString(op, context);
             type = Type.INT;
 
         } else if ("++".equals(op) || "--".equals(op)) {
-            operand.assertInteger(op, context.getLog());
-            VariableExpression.class.cast(operand).assertWritable(context.getLog());
+            operand.assertInteger(op, context);
+            VariableExpression.class.cast(operand).assertWritable(context);
             type = Type.INT;
 
         } else {
