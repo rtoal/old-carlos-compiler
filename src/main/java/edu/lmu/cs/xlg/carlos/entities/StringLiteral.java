@@ -20,6 +20,6 @@ public class StringLiteral extends Literal {
     @Override
     public void analyze(AnalysisContext context) {
         type = Type.STRING;
-        values = CharLiteral.codepoints(getLexeme(), 1, getLexeme().length() - 1, context.getLog());
+        values = CharLiteral.codepoints(getLexeme(), 1, getLexeme().length() - 1, context);
     }
 }

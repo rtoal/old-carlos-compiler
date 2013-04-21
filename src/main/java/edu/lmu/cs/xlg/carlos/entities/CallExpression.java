@@ -37,7 +37,7 @@ public class CallExpression extends VariableExpression {
         }
 
         // Find out which function we're calling
-        function = context.getTable().lookupFunction(functionName, args, context.getLog());
+        function = context.lookupFunction(functionName, args);
 
         if (function == null) {
             // If we can't find the function, just forget it
@@ -47,7 +47,7 @@ public class CallExpression extends VariableExpression {
 
         // Since called from expression, must have a return type
         if (function.getReturnType() == null) {
-            context.getLog().error("void_function_in_expression", functionName);
+            context.error("void_function_in_expression", functionName);
             type = Type.ARBITRARY;
         } else {
             type = function.getReturnType();

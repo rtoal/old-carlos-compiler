@@ -38,7 +38,7 @@ public class ArrayAggregate extends Expression {
     public void analyze(AnalysisContext context) {
         type = context.lookupType(typename);
         if (! (type instanceof ArrayType)) {
-            context.getLog().error("illegal_aggregate_type", type.getName());
+            context.error("illegal_aggregate_type", type.getName());
             return;
         }
 

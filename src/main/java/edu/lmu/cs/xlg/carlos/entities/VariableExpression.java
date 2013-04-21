@@ -17,7 +17,7 @@ public abstract class VariableExpression extends Expression {
      */
     public void assertWritable(AnalysisContext context) {
         if (!isWritable()) {
-            context.getLog().error("read_only_error");
+            context.error("read_only_error");
         }
     }
 }

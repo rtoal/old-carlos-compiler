@@ -58,7 +58,7 @@ public class PrefixExpression extends Expression {
             type = Type.INT;
 
         } else {
-            context.getLog().error("compiler_bug");
+            context.error("compiler_bug");
             type = Type.ARBITRARY;
         }
     }

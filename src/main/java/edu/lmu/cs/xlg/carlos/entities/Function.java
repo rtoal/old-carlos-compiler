@@ -36,13 +36,11 @@ public class Function extends Declarable {
     }
 
     /**
-     * Creates a function object for one of the built-in functions;
-     * these functions do not record their parameters, have no body,
-     * and are never overloaded.
+     * Creates a function object for one of the built-in functions; these functions do not record
+     * their parameters, have no body, and are never overloaded.
      *
-     * <p>Note that standard functions are created before a program
-     * is ever semantically analyzed, so there's no need to run
-     * semantic analysis on standard functions. Instead, we just
+     * <p>Note that standard functions are created before a program is ever semantically analyzed,
+     * so there's no need to run semantic analysis on standard functions. Instead, we just
      * assign their types at creation time.</p>
      */
     public Function(Type returnType, String name, Type... parameterTypes) {
@@ -83,23 +81,20 @@ public class Function extends Declarable {
     }
 
     /**
-     * Returns whether this function is a "void" function.  (The reason
-     * for this function is that voidness can be implemented in several
-     * ways, such as a return type of null, or the return type set
-     * to some special void-type-object.  If we change strategies, we
-     * can just make the change here.
+     * Returns whether this function is a "void" function.  (The reason for this function is that
+     * voidness can be implemented in several ways, such as a return type of null, or the return
+     * type set to some special void-type-object.  If we change strategies, we can just make the
+     * change here.
      */
     public boolean isVoid() {
         return returnType == null;
     }
 
     /**
-     * Performs semantic analysis on the function's signature and
-     * return type, but not the body.
+     * Performs semantic analysis on the function's signature and return type, but not the body.
      */
     public void analyzeSignature(AnalysisContext context) {
-        returnType = returnTypeName == "void" ? null
-            : context.getTable().lookupType(returnTypeName, context.getLog());
+        returnType = returnTypeName == "void" ? null : context.lookupType(returnTypeName);
         body.createTable(context.getTable());
         for (Variable parameter: parameters) {
             body.getTable().insert(parameter, context.getLog());
@@ -108,10 +103,9 @@ public class Function extends Declarable {
     }
 
     /**
-     * Performs semantics analysis on the body.  This is done after the
-     * signature has been analyzed, so the body's symbol table has
-     * already been constructed and the parameters have already been
-     * loaded.
+     * Performs semantics analysis on the body.  This is done after the signature has been
+     * analyzed, so the body's symbol table has already been constructed and the parameters
+     * have already been loaded.
      */
     @Override
     public void analyze(AnalysisContext context) {

@@ -32,7 +32,7 @@ public class EmptyArray extends Expression {
      * type.  The type of the overall expression is an array of something.
      */
     public void analyze(AnalysisContext context) {
-        type = context.getTable().lookupType(tyname, context.getLog());
+        type = context.lookupType(tyname);
 
         for (Expression bound: bounds) {
             bound.analyze(context);

@@ -63,7 +63,7 @@ public class InfixExpression extends Expression {
         } else if (op.matches("==|!=")) {
             if (!(left.isCompatibleWith(right.type)
             || right.isCompatibleWith(left.type))) {
-                context.getLog().error("non_compatible", op, left.type.getName(), right.type.getName());
+                context.error("non_compatible", op, left.type.getName(), right.type.getName());
             }
             type = Type.BOOLEAN;
 

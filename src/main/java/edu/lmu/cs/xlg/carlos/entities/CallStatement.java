@@ -37,11 +37,11 @@ public class CallStatement extends Statement {
         }
 
         // Find out which function we're referring to.
-        function = context.getTable().lookupFunction(functionName, args, context.getLog());
+        function = context.lookupFunction(functionName, args);
 
         // Ensure it is void
         if (function != null && function.getReturnType() != null) {
-            context.getLog().error("non_void_function_in_statement", functionName);
+            context.error("non_void_function_in_statement", functionName);
         }
     }
 }

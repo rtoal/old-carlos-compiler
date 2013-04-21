@@ -30,49 +30,49 @@ public abstract class Expression extends Entity {
 
     void assertAssignableTo(Type otherType, AnalysisContext context, String errorKey) {
         if (!this.isCompatibleWith(otherType)) {
-            context.getLog().error(errorKey, otherType.getName(), this.type.getName());
+            context.error(errorKey, otherType.getName(), this.type.getName());
         }
     }
 
     void assertArithmetic(String operator, AnalysisContext context) {
         if (!(type == Type.INT || type == Type.REAL)) {
-            context.getLog().error("non_arithmetic", operator);
+            context.error("non_arithmetic", operator);
         }
     }
 
     void assertInteger(String operator, AnalysisContext context) {
         if (!(type == Type.INT)) {
-            context.getLog().error("non_integer", operator);
+            context.error("non_integer", operator);
         }
     }
 
     void assertBoolean(String operator, AnalysisContext context) {
         if (!(type == Type.BOOLEAN)) {
-            context.getLog().error("non_boolean", operator);
+            context.error("non_boolean", operator);
         }
     }
 
     void assertChar(String operator, AnalysisContext context) {
         if (!(type == Type.CHAR)) {
-            context.getLog().error("non_char", operator);
+            context.error("non_char", operator);
         }
     }
 
     void assertArray(String operator, AnalysisContext context) {
         if (!(type instanceof ArrayType)) {
-            context.getLog().error("non_array", operator);
+            context.error("non_array", operator);
         }
     }
 
     void assertString(String operator, AnalysisContext context) {
         if (!(type == Type.STRING)) {
-            context.getLog().error("non_string", operator);
+            context.error("non_string", operator);
         }
     }
 
     void assertArrayOrString(String operator, AnalysisContext context) {
         if (!(type == Type.STRING || type instanceof ArrayType)) {
-            context.getLog().error("non_array_or_string", operator);
+            context.error("non_array_or_string", operator);
         }
     }
 }

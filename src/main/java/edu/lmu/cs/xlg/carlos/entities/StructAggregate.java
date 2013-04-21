@@ -31,16 +31,16 @@ public class StructAggregate extends Expression {
 
     @Override
     public void analyze(AnalysisContext context) {
-        type = context.getTable().lookupType(typename, context.getLog());
+
+        type = context.lookupType(typename);
         if (!(type instanceof StructType)) {
-            context.getLog().error("illegal_aggregate_type", type.getName());
+            context.error("illegal_aggregate_type", type.getName());
             return;
         }
 
         List<StructField> fields = StructType.class.cast(type).getFields();
-
         if (args.size() != fields.size()) {
-            context.getLog().error("wrong_number_of_fields", type.getName(), fields.size(), args.size());
+            context.error("wrong_number_of_fields", type.getName(), fields.size(), args.size());
             return;
         }
 

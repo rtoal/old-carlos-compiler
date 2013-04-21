@@ -1,7 +1,7 @@
 package edu.lmu.cs.xlg.carlos.entities;
 
 /**
- * A variable reference that is made up of a simple identfier.
+ * A variable reference that consists solely of a simple identifier.
  */
 public class SimpleVariableReference extends VariableExpression {
 
@@ -22,13 +22,12 @@ public class SimpleVariableReference extends VariableExpression {
 
     @Override
     public void analyze(AnalysisContext context) {
-        referent = context.getTable().lookupVariable(name, context.getLog());
+        referent = context.lookupVariable(name);
         type = referent.getType();
     }
 
     /**
-     * Returns true, because simple variables are always writable
-     * in Carlos.
+     * Returns true, because simple variables are always writable in Carlos.
      */
     public boolean isWritable() {
        return true;

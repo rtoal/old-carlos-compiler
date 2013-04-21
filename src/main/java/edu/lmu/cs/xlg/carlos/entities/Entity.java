@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -302,6 +303,18 @@ public abstract class Entity {
 
         public Type lookupType(String name) {
             return getTable().lookupType(name, getLog());
+        }
+
+        public Variable lookupVariable(String name) {
+            return getTable().lookupVariable(name, getLog());
+        }
+
+        public Function lookupFunction(String name, List<Expression> args) {
+            return getTable().lookupFunction(name, args, getLog());
+        }
+
+        public void error(String errorKey, Object... arguments) {
+            log.error(errorKey, arguments);
         }
     }
 

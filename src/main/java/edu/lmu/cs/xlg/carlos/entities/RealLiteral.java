@@ -21,7 +21,7 @@ public class RealLiteral extends Literal {
         try {
             value = Double.parseDouble(getLexeme());
         } catch (NumberFormatException e) {
-            context.getLog().error("bad_real", getLexeme());
+            context.error("bad_real", getLexeme());
         }
     }
 }

@@ -25,7 +25,7 @@ public class StructType extends Type {
         Set<String> fieldNames = new HashSet<String>();
         for (StructField field: fields) {
             if (! fieldNames.add(field.getName())) {
-                context.getLog().error("duplicate_field", field.getName(), this.getName());
+                context.error("duplicate_field", field.getName(), this.getName());
             }
         }
 
@@ -46,7 +46,7 @@ public class StructType extends Type {
         }
 
         // Didn't find it, use the placeholder.
-        context.getLog().error("no_such_field", this.getName(), fieldName);
+        context.error("no_such_field", this.getName(), fieldName);
         return StructField.ARBITRARY;
     }
 }

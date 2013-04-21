@@ -36,7 +36,7 @@ public class DottedVariable extends VariableExpression {
         struct.analyze(context);
 
         if (!(struct.type instanceof StructType)) {
-            context.getLog().error("not_a_struct");
+            context.error("not_a_struct");
             type = Type.ARBITRARY;
         } else {
             field = ((StructType)struct.type).getField(fieldName, context);
