@@ -28,9 +28,9 @@ public abstract class Expression extends Entity {
     // Helpers for semantic analysis, called from the analyze methods of other expressions.  These
     // are by no means necessary, but they are very convenient.
 
-    void assertAssignableTo(Type otherType, AnalysisContext context, String errorKey) {
+    void assertAssignableTo(Type otherType, AnalysisContext context, String construct) {
         if (!this.isCompatibleWith(otherType)) {
-            context.error(errorKey, otherType.getName(), this.type.getName());
+            context.error("type_mismatch", construct, otherType.getName(), this.type.getName());
         }
     }
 

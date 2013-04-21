@@ -26,6 +26,6 @@ public class AssignmentStatement extends Statement {
         left.analyze(context);
         right.analyze(context);
         left.assertWritable(context);
-        right.assertAssignableTo(left.type, context, "assignment_type_error");
+        right.assertAssignableTo(left.type, context, "assignment");
     }
 }

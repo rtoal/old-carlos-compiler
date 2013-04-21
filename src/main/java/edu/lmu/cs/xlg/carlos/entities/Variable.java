@@ -53,7 +53,7 @@ public class Variable extends Declarable {
         // If an initializer is present, analyze it and check types.
         if (initializer != null) {
             initializer.analyze(context);
-            initializer.assertAssignableTo(type, context, "init_type_error");
+            initializer.assertAssignableTo(type, context, "variable_initialization");
         }
     }
 }

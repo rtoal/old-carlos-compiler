@@ -34,7 +34,7 @@ public class StructAggregate extends Expression {
 
         type = context.lookupType(typename);
         if (!(type instanceof StructType)) {
-            context.error("illegal_aggregate_type", type.getName());
+            context.error("not_a_struct_type", type.getName());
             return;
         }
 
@@ -50,7 +50,7 @@ public class StructAggregate extends Expression {
             Expression a = ai.next();
             StructField f = fi.next();
             a.analyze(context);
-            a.assertAssignableTo(f.getType(), context, "sagg_type_error");
+            a.assertAssignableTo(f.getType(), context, "struct_aggregate");
         }
     }
 }
