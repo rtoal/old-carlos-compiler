@@ -24,4 +24,11 @@ public class RealLiteral extends Literal {
             context.error("bad_real", getLexeme());
         }
     }
+
+    // Back door for the optimizer to create these things.
+    static RealLiteral fromValue(double value) {
+        RealLiteral result = new RealLiteral(Double.toString(value));
+        result.value = value;
+        return result;
+    }
 }

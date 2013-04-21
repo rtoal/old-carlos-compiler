@@ -1,5 +1,7 @@
 package edu.lmu.cs.xlg.carlos.entities;
 
+import java.util.ArrayList;
+
 /**
  * A statement of the form "for (t i = e1; e2; e3) block" where each of the three sections
  * (the parts separated by semicolons) are optional.
@@ -81,5 +83,30 @@ public class ClassicForStatement extends Statement {
 
         // Analyze the body, noting that it *is* a loop body.
         body.analyze(context.withInLoop(true));
+    }
+
+    @Override
+    public Statement optimize() {
+        if (init != null) {
+            init = init.optimize();
+        }
+        if (test != null) {
+            test = test.optimize();
+            if (test.isFalse()) {
+                if (init != null) {
+                    // Don't need to do the loop, but we have to execute init for its side-effects
+                    each = null;
+                    body = new Block(new ArrayList<Statement>());
+                } else {
+                    // This whole statement is a giant no-op
+                    return null;
+                }
+            }
+        }
+        if (each != null) {
+            each = each.optimize();
+        }
+        body.optimize();
+        return this;
     }
 }

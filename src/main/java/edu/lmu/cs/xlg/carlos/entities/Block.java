@@ -2,6 +2,7 @@ package edu.lmu.cs.xlg.carlos.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A block, which is a container of a sequence of statements with its own symbol table.
@@ -132,6 +133,23 @@ public class Block extends Entity {
                 }
             }
             s.analyze(context.withTable(table));
+        }
+    }
+
+    /**
+     * Performs local optimizations on this block.  In particular we ask each statement in the
+     * block to optimize itself.  In cases where the optimization of a statement detects dead
+     * or unreachable code, we remove that statement.
+     */
+    public void optimize() {
+        for (ListIterator<Statement> it = statements.listIterator(); it.hasNext();) {
+            Statement original = it.next();
+            Statement optimized = original.optimize();
+            if (optimized == null) {
+                it.remove();
+            } else if (optimized != original) {
+                it.set(optimized);
+            }
         }
     }
 }

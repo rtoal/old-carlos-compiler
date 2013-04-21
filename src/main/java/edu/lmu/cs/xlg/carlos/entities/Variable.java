@@ -56,4 +56,11 @@ public class Variable extends Declarable {
             initializer.assertAssignableTo(type, context, "variable_initialization");
         }
     }
+
+    @Override
+    public void optimize() {
+        if (initializer != null) {
+            initializer = initializer.optimize();
+        }
+    }
 }

@@ -19,4 +19,10 @@ public class Declaration extends Statement {
     public void analyze(AnalysisContext context) {
         declarable.analyze(context);
     }
+
+    @Override
+    public Statement optimize() {
+        declarable.optimize();
+        return this;
+    }
 }

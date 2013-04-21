@@ -27,4 +27,9 @@ public class Case extends Entity {
         condition.assertBoolean("if_statement_condition", context);
         body.analyze(context);
     }
+
+    public void optimize() {
+        condition = condition.optimize();
+        body.optimize();
+    }
 }

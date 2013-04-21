@@ -189,8 +189,14 @@ public class CarlosToJavaScriptTranslator {
             lead = "} else if";
         }
         if (s.getElsePart() != null) {
-            emit("} else {");
-            translateBlock(s.getElsePart());
+            if (s.getCases().isEmpty()) {
+                for (Statement statement: s.getElsePart().getStatements()) {
+                    translateStatement(statement);
+                }
+            } else {
+                emit("} else {");
+                translateBlock(s.getElsePart());
+            }
         }
         emit("}");
     }

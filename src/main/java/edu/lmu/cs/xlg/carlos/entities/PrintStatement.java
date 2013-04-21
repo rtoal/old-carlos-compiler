@@ -1,6 +1,7 @@
 package edu.lmu.cs.xlg.carlos.entities;
 
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A simple print statement.
@@ -19,8 +20,16 @@ public class PrintStatement extends Statement {
 
     @Override
     public void analyze(AnalysisContext context) {
-        for (Expression a : args) {
-            a.analyze(context);
+        for (Expression arg : args) {
+            arg.analyze(context);
         }
+    }
+
+    @Override
+    public Statement optimize() {
+        for (ListIterator<Expression> it = args.listIterator(); it.hasNext();) {
+            it.set(it.next().optimize());
+        }
+        return this;
     }
 }

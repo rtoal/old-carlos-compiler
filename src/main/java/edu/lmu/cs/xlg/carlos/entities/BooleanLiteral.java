@@ -16,4 +16,9 @@ public class BooleanLiteral extends Literal {
     public void analyze(AnalysisContext context) {
         this.type = Type.BOOLEAN;
     }
+
+    // Back door for optimizer.  Returns one of the enum values.
+    static BooleanLiteral fromValue(boolean value) {
+        return value ? TRUE : FALSE;
+    }
 }

@@ -38,4 +38,10 @@ public class ReturnStatement extends Statement {
                 "return_statement");
         }
     }
+
+    @Override
+    public Statement optimize() {
+        returnExpression = returnExpression.optimize();
+        return this;
+    }
 }

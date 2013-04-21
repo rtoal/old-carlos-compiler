@@ -112,6 +112,10 @@ public class Viewer extends JFrame {
             public void actionPerformed(ActionEvent e) {viewSemanticGraph();}
         };
 
+        Action optimizeAction = new AbstractAction("Optimize") {
+            public void actionPerformed(ActionEvent e) {viewOptimizedSemanticGraph();}
+        };
+
         Action javaScriptAction = new AbstractAction("JavaScript") {
             public void actionPerformed(ActionEvent e) {viewJavaScript();}
         };
@@ -122,6 +126,7 @@ public class Viewer extends JFrame {
         menuBar.add(new JButton(saveAsAction));
         menuBar.add(new JButton(syntaxAction));
         menuBar.add(new JButton(semanticsAction));
+        menuBar.add(new JButton(optimizeAction));
         menuBar.add(new JButton(javaScriptAction));
         setJMenuBar(menuBar);
 
@@ -222,6 +227,21 @@ public class Viewer extends JFrame {
         }
     }
 
+    private void viewOptimizedSemanticGraph() {
+        try {
+            Program program = optimize();
+            if (log.getErrorCount() > 0) {
+                displayErrorOutput();
+            } else {
+                StringWriter writer = new StringWriter();
+                program.printEntities(new PrintWriter(writer));
+                displaySuccessfulOutput(writer);
+            }
+        } catch (Exception e) {
+            displayExceptionOutput(e);
+        }
+    }
+
     private void viewJavaScript() {
         try {
             StringWriter writer = toJavaScript();
@@ -249,8 +269,15 @@ public class Viewer extends JFrame {
         return program;
     }
 
-    private StringWriter toJavaScript() {
+    private Program optimize() {
         Program program = analyze();
+        if (log.getErrorCount() > 0) return null;
+        program.optimize();
+        return program;
+    }
+
+    private StringWriter toJavaScript() {
+        Program program = optimize();
         if (log.getErrorCount() > 0) return null;
         StringWriter writer = new StringWriter();
         new CarlosToJavaScriptTranslator().translateProgram(program, new PrintWriter(writer));

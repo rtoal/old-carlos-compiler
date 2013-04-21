@@ -14,4 +14,12 @@ public abstract class Declarable extends Entity {
     public String getName() {
         return name;
     }
+
+    /**
+     * Optimizes this entity.  Intended to be overridden by subclasses, but a default do-nothing
+     * implementation is provided here because not all declarables require any optimization.
+     */
+    public void optimize() {
+        // Intentionally empty
+    }
 }

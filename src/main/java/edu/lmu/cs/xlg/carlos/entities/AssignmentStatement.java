@@ -28,4 +28,14 @@ public class AssignmentStatement extends Statement {
         left.assertWritable(context);
         right.assertAssignableTo(left.type, context, "assignment");
     }
+
+    @Override
+    public Statement optimize() {
+        right = right.optimize();
+        if (left.sameVariableAs(right)) {
+            // Assignment to self is a no-op
+            return null;
+        }
+        return this;
+    }
 }

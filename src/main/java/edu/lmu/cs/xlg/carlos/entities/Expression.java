@@ -75,4 +75,48 @@ public abstract class Expression extends Entity {
             context.error("non_array_or_string", operator);
         }
     }
+
+    /**
+     * Optimizes this expression, returning an optimized version if possible, otherwise returns
+     * the expression itself.  This method is intended to be overridden in subclasses; however,
+     * since most forms of expressions require no optimization, a default implementation is
+     * provided here.
+     */
+    public Expression optimize() {
+        return this;
+    }
+
+    boolean isZero() {
+        return (this instanceof IntegerLiteral && IntegerLiteral.class.cast(this).getValue() == 0)
+                || (this instanceof RealLiteral && RealLiteral.class.cast(this).getValue() == 0);
+    }
+
+    boolean isOne() {
+        return (this instanceof IntegerLiteral && IntegerLiteral.class.cast(this).getValue() == 1)
+                || (this instanceof RealLiteral && RealLiteral.class.cast(this).getValue() == 1);
+    }
+
+    boolean isFalse() {
+        return BooleanLiteral.FALSE.equals(this);
+    }
+
+    boolean isTrue() {
+        return BooleanLiteral.TRUE.equals(this);
+    }
+
+    boolean sameVariableAs(Expression that) {
+        return this instanceof SimpleVariableReference && that instanceof SimpleVariableReference &&
+                SimpleVariableReference.class.cast(this).getReferent() ==
+                SimpleVariableReference.class.cast(that).getReferent();
+    }
+
+    double constantValue(Expression e) {
+        if (e instanceof RealLiteral) {
+            return RealLiteral.class.cast(e).getValue();
+        } else if (e instanceof IntegerLiteral) {
+            return IntegerLiteral.class.cast(e).getValue();
+        } else {
+            throw new RuntimeException("Internal Error in Optimizer");
+        }
+    }
 }

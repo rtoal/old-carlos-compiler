@@ -2,6 +2,7 @@ package edu.lmu.cs.xlg.carlos.entities;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * The If statement.
@@ -36,5 +37,31 @@ public class IfStatement extends Statement {
         if (elsePart != null) {
             elsePart.analyze(context);
         }
+    }
+
+    @Override
+    public Statement optimize() {
+        boolean earlyOutDetected = false;
+        for (ListIterator<Case> it = cases.listIterator(); it.hasNext();) {
+            Case thisCase = it.next();
+            if (earlyOutDetected) {
+                it.remove();
+                continue;
+            }
+            thisCase.optimize();
+            if (thisCase.getCondition().isFalse()) {
+                it.remove();
+            } else if (thisCase.getCondition().isTrue()) {
+                earlyOutDetected = true;
+            }
+        }
+        if (elsePart != null) {
+            if (earlyOutDetected) {
+                elsePart = null;
+            } else {
+                elsePart.optimize();
+            }
+        }
+        return this;
     }
 }

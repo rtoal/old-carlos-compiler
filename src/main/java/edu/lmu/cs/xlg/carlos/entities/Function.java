@@ -134,4 +134,11 @@ public class Function extends Declarable {
         // All checks passed
         return true;
     }
+
+    @Override
+    public void optimize() {
+        body.optimize();
+
+        // TODO Look for and handle tail recursion if applicable.
+    }
 }

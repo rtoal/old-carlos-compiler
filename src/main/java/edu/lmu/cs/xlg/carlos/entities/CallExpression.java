@@ -1,6 +1,7 @@
 package edu.lmu.cs.xlg.carlos.entities;
 
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * The result of a function call, which is a variable.
@@ -26,6 +27,13 @@ public class CallExpression extends VariableExpression {
 
     public String getFunctionName() {
         return functionName;
+    }
+
+    /**
+     * Returns false, as one can never write to a function call result.
+     */
+    public boolean isWritable() {
+        return false;
     }
 
     @Override
@@ -54,10 +62,11 @@ public class CallExpression extends VariableExpression {
         }
     }
 
-    /**
-     * Returns false, as one can never write to a function call result.
-     */
-    public boolean isWritable() {
-        return false;
+    @Override
+    public Expression optimize() {
+        for (ListIterator<Expression> it = args.listIterator(); it.hasNext();) {
+            it.set(it.next().optimize());
+        }
+        return this;
     }
 }

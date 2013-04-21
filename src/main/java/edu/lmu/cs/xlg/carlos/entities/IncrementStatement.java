@@ -28,4 +28,10 @@ public class IncrementStatement extends Statement {
         target.analyze(context);
         target.assertInteger(op, context);
     }
+
+    @Override
+    public Statement optimize() {
+        target = VariableExpression.class.cast(target.optimize());
+        return this;
+    }
 }

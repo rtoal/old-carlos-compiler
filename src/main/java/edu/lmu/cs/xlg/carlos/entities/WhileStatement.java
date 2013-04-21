@@ -27,4 +27,15 @@ public class WhileStatement extends Statement {
         condition.assertBoolean("while_statement_condition", context);
         body.analyze(context.withInLoop(true));
     }
+
+    @Override
+    public Statement optimize() {
+        condition = condition.optimize();
+        body.optimize();
+        if  (condition.isFalse()) {
+            // "while (false)" is a no-op
+            return null;
+        }
+        return this;
+    }
 }

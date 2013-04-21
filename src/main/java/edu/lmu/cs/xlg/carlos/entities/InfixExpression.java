@@ -75,4 +75,82 @@ public class InfixExpression extends Expression {
             type = Type.BOOLEAN;
         }
     }
+
+    @Override
+    public Expression optimize() {
+        left = left.optimize();
+        right = right.optimize();
+        if (left.getType().isArithmetic() && right.getType().isArithmetic()) {
+            return optimizeArithmetic();
+        } else if (left.getType().equals(Type.BOOLEAN) && right.getType().equals(Type.BOOLEAN)) {
+            return optimizeBoolean();
+        } else {
+            return this;
+        }
+    }
+
+    public Expression optimizeBoolean() {
+        if (op == "&&") {
+            if (left.isFalse() || right.isFalse()) {
+                return BooleanLiteral.FALSE;
+            } else if (left.isTrue()) {
+                return right;
+            } else if (right.isTrue()) {
+                return left;
+            } else if (left.sameVariableAs(right)) {
+                return left;
+            }
+        } else if (op == "||") {
+            if (left.isTrue() || right.isTrue()) {
+                return BooleanLiteral.TRUE;
+            } else if (left.isFalse()) {
+                return right;
+            } else if (right.isFalse()) {
+                return left;
+            } else if (left.sameVariableAs(right)) {
+                return left;
+            }
+        }
+
+        // Can't optimize it
+        return this;
+    }
+
+    public Expression optimizeArithmetic() {
+
+        if (left instanceof Literal && right instanceof Literal) {
+            // Constant Folding
+            double x = constantValue(left);
+            double y = constantValue(right);
+
+            if ("+".equals(op)) return RealLiteral.fromValue(x + y);
+            else if ("-".equals(op)) return RealLiteral.fromValue(x - y);
+            else if ("*".equals(op)) return RealLiteral.fromValue(x * y);
+            else if ("/".equals(op) && y != 0) return RealLiteral.fromValue(x / y);
+            else if ("<".equals(op)) return BooleanLiteral.fromValue(x < y);
+            else if ("<=".equals(op)) return BooleanLiteral.fromValue(x <= y);
+            else if ("==".equals(op)) return BooleanLiteral.fromValue(x == y);
+            else if ("!=".equals(op)) return BooleanLiteral.fromValue(x != y);
+            else if (">=".equals(op)) return BooleanLiteral.fromValue(x >= y);
+            else if (">".equals(op)) return BooleanLiteral.fromValue(x > y);
+
+        } else if ("+".equals(op)) {
+            if (right.isZero()) return left;
+            if (left.isZero()) return right;
+        } else if ("-".equals(op)) {
+            if (right.isZero()) return left;
+            if (left.sameVariableAs(right)) return RealLiteral.fromValue(0);
+        } else if ("*".equals(op)) {
+            if (right.isOne()) return left;
+            if (left.isOne()) return right;
+            if (right.isZero()) return RealLiteral.fromValue(0);
+            if (left.isZero()) return RealLiteral.fromValue(0);
+        } else if ("/".equals(op)) {
+            if (right.isOne()) return left;
+            if (left.sameVariableAs(right)) return RealLiteral.fromValue(1);
+        }
+
+        // Could not find any optimizations
+        return this;
+    }
 }
