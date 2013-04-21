@@ -64,6 +64,14 @@ public class CarlosToJavaScriptTranslator {
         .put(Function.SQRT, "Math.sqrt")
         .build();
 
+    private ImmutableMap<Type, String> initialValues = ImmutableMap.<Type, String>builder()
+        .put(Type.BOOLEAN, "false")
+        .put(Type.CHAR, "'\\0'")
+        .put(Type.INT, "0")
+        .put(Type.REAL, "0.0")
+        .put(Type.STRING, "\"\"")
+        .build();
+
     public void translateProgram(Program program, PrintWriter writer) {
         this.writer = writer;
         emit("(function () {");
@@ -129,11 +137,16 @@ public class CarlosToJavaScriptTranslator {
     }
 
     private void translateVariableDeclaration(Variable v) {
+        String initializer;
         if (v.getInitializer() == null) {
-            emit ("var %s;", variable(v));
+            initializer = initialValues.get(v.getType());
+            if (initializer == null) {
+                initializer = "null";
+            }
         } else {
-            emit ("var %s = %s;", variable(v), translateExpression(v.getInitializer()));
+            initializer = translateExpression(v.getInitializer());
         }
+        emit ("var %s = %s;", variable(v), initializer);
     }
 
     private void translateFunctionDeclaration(Function f) {
