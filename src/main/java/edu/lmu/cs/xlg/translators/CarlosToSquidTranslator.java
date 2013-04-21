@@ -420,6 +420,9 @@ public class CarlosToSquidTranslator {
         for (Case c: is.getCases()) {
             translate(c, s);
         }
+        if (is.getElsePart() != null) {
+            translate(is.getElsePart(), s);
+        }
     }
 
     /**
