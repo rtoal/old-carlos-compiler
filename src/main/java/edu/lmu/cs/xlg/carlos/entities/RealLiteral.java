@@ -5,13 +5,13 @@ package edu.lmu.cs.xlg.carlos.entities;
  */
 public class RealLiteral extends Literal {
 
-    private double value;
+    private Double value;
 
     public RealLiteral(String lexeme) {
         super(lexeme);
     }
 
-    public double getValue() {
+    public Double getValue() {
         return value;
     }
 

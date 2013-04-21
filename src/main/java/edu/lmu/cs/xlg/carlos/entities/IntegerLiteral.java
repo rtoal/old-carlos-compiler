@@ -5,13 +5,13 @@ package edu.lmu.cs.xlg.carlos.entities;
  */
 public class IntegerLiteral extends Literal {
 
-    private int value;
+    Integer value;
 
     public IntegerLiteral(String lexeme) {
         super(lexeme);
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 

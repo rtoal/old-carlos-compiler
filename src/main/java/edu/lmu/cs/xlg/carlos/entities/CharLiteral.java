@@ -8,13 +8,13 @@ import java.util.List;
  */
 public class CharLiteral extends Literal {
 
-    private int value;
+    private Integer value;
 
     public CharLiteral(String lexeme) {
         super(lexeme);
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 
