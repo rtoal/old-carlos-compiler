@@ -101,7 +101,7 @@ public class Viewer extends JFrame {
             public void actionPerformed(ActionEvent e) {saveAsFile();}
         };
 
-        Action quitAction = new AbstractAction("Quit") {
+        new AbstractAction("Quit") {
             {
                 putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Q);
                 putValue(Action.ACCELERATOR_KEY, getKeyStroke("control Q"));

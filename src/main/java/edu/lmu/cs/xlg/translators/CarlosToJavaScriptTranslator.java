@@ -2,22 +2,29 @@ package edu.lmu.cs.xlg.translators;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.base.Joiner;
 
+import edu.lmu.cs.xlg.carlos.entities.ArrayAggregate;
 import edu.lmu.cs.xlg.carlos.entities.AssignmentStatement;
 import edu.lmu.cs.xlg.carlos.entities.Block;
 import edu.lmu.cs.xlg.carlos.entities.BooleanLiteral;
 import edu.lmu.cs.xlg.carlos.entities.BreakStatement;
+import edu.lmu.cs.xlg.carlos.entities.CallExpression;
 import edu.lmu.cs.xlg.carlos.entities.CallStatement;
 import edu.lmu.cs.xlg.carlos.entities.Case;
 import edu.lmu.cs.xlg.carlos.entities.CharLiteral;
 import edu.lmu.cs.xlg.carlos.entities.ClassicForStatement;
 import edu.lmu.cs.xlg.carlos.entities.Declaration;
+import edu.lmu.cs.xlg.carlos.entities.DottedVariable;
+import edu.lmu.cs.xlg.carlos.entities.EmptyArray;
+import edu.lmu.cs.xlg.carlos.entities.Entity;
 import edu.lmu.cs.xlg.carlos.entities.Expression;
 import edu.lmu.cs.xlg.carlos.entities.Function;
 import edu.lmu.cs.xlg.carlos.entities.IfStatement;
+import edu.lmu.cs.xlg.carlos.entities.IncrementStatement;
 import edu.lmu.cs.xlg.carlos.entities.InfixExpression;
 import edu.lmu.cs.xlg.carlos.entities.IntegerLiteral;
 import edu.lmu.cs.xlg.carlos.entities.NullLiteral;
@@ -27,7 +34,14 @@ import edu.lmu.cs.xlg.carlos.entities.PrintStatement;
 import edu.lmu.cs.xlg.carlos.entities.Program;
 import edu.lmu.cs.xlg.carlos.entities.RealLiteral;
 import edu.lmu.cs.xlg.carlos.entities.ReturnStatement;
+import edu.lmu.cs.xlg.carlos.entities.SimpleVariableReference;
 import edu.lmu.cs.xlg.carlos.entities.Statement;
+import edu.lmu.cs.xlg.carlos.entities.StringLiteral;
+import edu.lmu.cs.xlg.carlos.entities.StructAggregate;
+import edu.lmu.cs.xlg.carlos.entities.StructField;
+import edu.lmu.cs.xlg.carlos.entities.StructType;
+import edu.lmu.cs.xlg.carlos.entities.SubscriptedVariable;
+import edu.lmu.cs.xlg.carlos.entities.Type;
 import edu.lmu.cs.xlg.carlos.entities.Variable;
 import edu.lmu.cs.xlg.carlos.entities.VariableExpression;
 import edu.lmu.cs.xlg.carlos.entities.WhileStatement;
@@ -44,120 +58,150 @@ public class CarlosToJavaScriptTranslator {
     public void translateProgram(Program program, PrintWriter writer) {
         this.writer = writer;
         emit("(function () {");
-        generateBlock(program);
+        translateBlock(program);
         emit("}());");
     }
 
-    private void generateBlock(Block block) {
+    private void translateBlock(Block block) {
         indentLevel++;
         for (Statement s: block.getStatements()) {
-            generateStatement(s);
+            translateStatement(s);
         }
         indentLevel--;
     }
 
-    private void generateStatement(Statement s) {
+    private void translateStatement(Statement s) {
 
         if (s instanceof Declaration) {
-            generateDeclaration(Declaration.class.cast(s));
+            translateDeclaration(Declaration.class.cast(s));
 
         } else if (s instanceof AssignmentStatement) {
-            generateAssignmentStatement(AssignmentStatement.class.cast(s));
+            translateAssignmentStatement(AssignmentStatement.class.cast(s));
+
+        } else if (s instanceof IncrementStatement) {
+            translateIncrementStatement(IncrementStatement.class.cast(s));
 
         } else if (s instanceof CallStatement) {
-            generateCallStatement(CallStatement.class.cast(s));
+            translateCallStatement(CallStatement.class.cast(s));
 
         } else if (s instanceof BreakStatement) {
             emit("break;");
 
         } else if (s instanceof ReturnStatement) {
-            generateReturnStatement(ReturnStatement.class.cast(s));
+            translateReturnStatement(ReturnStatement.class.cast(s));
 
         } else if (s instanceof PrintStatement) {
-            generatePrintStatement(PrintStatement.class.cast(s));
+            translatePrintStatement(PrintStatement.class.cast(s));
 
         } else if (s instanceof IfStatement) {
-            generateIfStatement(IfStatement.class.cast(s));
+            translateIfStatement(IfStatement.class.cast(s));
 
         } else if (s instanceof WhileStatement) {
-            generateWhileStatement(WhileStatement.class.cast(s));
+            translateWhileStatement(WhileStatement.class.cast(s));
 
         } else if (s instanceof ClassicForStatement) {
-            generateClassicForStatement(ClassicForStatement.class.cast(s));
+            translateClassicForStatement(ClassicForStatement.class.cast(s));
 
         } else {
             throw new RuntimeException("Unknown statement class: " + s.getClass().getName());
         }
     }
 
-    private void generateDeclaration(Declaration s) {
+    private void translateDeclaration(Declaration s) {
         if (s.getDeclarable() instanceof Variable) {
-            generateVariableDeclaration(Variable.class.cast(s.getDeclarable()));
+            translateVariableDeclaration(Variable.class.cast(s.getDeclarable()));
         } else if (s.getDeclarable() instanceof Function) {
-            generateFunctionDeclaration(Function.class.cast(s.getDeclarable()));
-        }
-    }
-
-    private void generateVariableDeclaration(Variable v) {
-        if (v.getInitializer() == null) {
-            emit ("var _v%d;", v.getId());
+            translateFunctionDeclaration(Function.class.cast(s.getDeclarable()));
+        } else if (s.getDeclarable() instanceof Type) {
+            // Intentionally empty; type declarations do not get translated in JavaScript
         } else {
-            emit ("var _v%d = %s;", v.getId(), generateExpression(v.getInitializer()));
+            throw new RuntimeException("Unknown declaration: " + s.getClass().getName());
         }
     }
 
-    private void generateFunctionDeclaration(Function f) {
-        emit("var _f%d = function (%s) {", f.getId(), generateIdList(f.getParameters()));
-        generateBlock(f.getBody());
+    private void translateVariableDeclaration(Variable v) {
+        if (v.getInitializer() == null) {
+            emit ("var %s;", variable(v));
+        } else {
+            emit ("var %s = %s;", variable(v), translateExpression(v.getInitializer()));
+        }
+    }
+
+    private void translateFunctionDeclaration(Function f) {
+        emit("var %s = function (%s) {", variable(f), translateParameters(f.getParameters()));
+        translateBlock(f.getBody());
         emit("}");
-
     }
 
-    private void generateAssignmentStatement(AssignmentStatement s) {
-        emit("%s = %s;", generateExpression(s.getLeft()), generateExpression(s.getRight()));
+    private void translateAssignmentStatement(AssignmentStatement s) {
+        emit("%s = %s;", translateExpression(s.getLeft()), translateExpression(s.getRight()));
     }
 
-    private void generateCallStatement(CallStatement s) {
-        emit("_f%d(%s);", s.getFunction().getId(), generateExpressionList(s.getArgs()));
+    private void translateIncrementStatement(IncrementStatement s) {
+        emit("%s%s;", translateExpression(s.getTarget()), s.getOp());
     }
 
-    private void generateReturnStatement(ReturnStatement s) {
+    private void translateCallStatement(CallStatement s) {
+        emit("%s(%s);", variable(s.getFunction()), translateExpressionList(s.getArgs()));
+    }
+
+    private void translateReturnStatement(ReturnStatement s) {
         if (s.getReturnExpression() == null) {
             emit("return;");
         } else {
-            emit("return %s;", generateExpression(s.getReturnExpression()));
+            emit("return %s;", translateExpression(s.getReturnExpression()));
         }
     }
 
-    private void generatePrintStatement(PrintStatement s) {
-        emit("console.log(" + generateExpressionList(s.getArgs()) + ")");
+    private void translatePrintStatement(PrintStatement s) {
+        for (Expression e: s.getArgs()) {
+            emit("console.log(%s);", translateExpression(e));
+        }
     }
 
-    private void generateIfStatement(IfStatement s) {
+    private void translateIfStatement(IfStatement s) {
         String lead = "if";
         for (Case c: s.getCases()) {
-            emit("%s (%s) {", lead, generateExpression(c.getCondition()));
-            generateBlock(c.getBody());
+            emit("%s (%s) {", lead, translateExpression(c.getCondition()));
+            translateBlock(c.getBody());
             lead = "} else if";
         }
         if (s.getElsePart() != null) {
             emit("} else {");
-            generateBlock(s.getElsePart());
+            translateBlock(s.getElsePart());
         }
         emit("}");
     }
 
-    private void generateWhileStatement(WhileStatement s) {
-        emit("while (%s) {", generateExpression(s.getCondition()));
-        generateBlock(s.getBody());
+    private void translateWhileStatement(WhileStatement s) {
+        emit("while (%s) {", translateExpression(s.getCondition()));
+        translateBlock(s.getBody());
         emit("}");
     }
 
-    private void generateClassicForStatement(ClassicForStatement s) {
-
+    private void translateClassicForStatement(ClassicForStatement s) {
+        String init = "", test = "", each = "";
+        if (s.getInit() != null) {
+            init = String.format("var %s = %s", variable(s.getIndexVariable()), s.getInit());
+        }
+        if (s.getTest() != null) {
+            test = translateExpression(s.getTest());
+        }
+        if (s.getEach() instanceof AssignmentStatement) {
+            AssignmentStatement e = AssignmentStatement.class.cast(s.getEach());
+            String left = translateExpression(e.getLeft());
+            String right = translateExpression(e.getRight());
+            each = String.format("%s = %s", left, right);
+        } else if (s.getEach() instanceof IncrementStatement) {
+            IncrementStatement e = IncrementStatement.class.cast(s.getEach());
+            each = String.format("%s%s", variable(e.getTarget()), e.getOp());
+        }
+        emit("for (%s; %s; %s) {", init, test, each);
+        translateBlock(s.getBody());
+        emit("}");
     }
 
-    private String generateExpression(Expression e) {
+    private String translateExpression(Expression e) {
         if (e instanceof IntegerLiteral) {
             return IntegerLiteral.class.cast(e).getValue().toString();
         } else if (e instanceof CharLiteral) {
@@ -170,45 +214,171 @@ public class CarlosToJavaScriptTranslator {
             return "true";
         } else if (e == BooleanLiteral.FALSE) {
             return "false";
+        } else if (e instanceof StringLiteral) {
+            return translateStringLiteral(StringLiteral.class.cast(e));
+        } else if (e instanceof ArrayAggregate) {
+            return translateArrayAggregate(ArrayAggregate.class.cast(e));
+        } else if (e instanceof StructAggregate) {
+            return translateStructAggregate(StructAggregate.class.cast(e));
+        } else if (e instanceof EmptyArray) {
+            return translateEmptyArray(EmptyArray.class.cast(e));
         } else if (e instanceof PrefixExpression) {
-            return generatePrefixExpression(PrefixExpression.class.cast(e));
+            return translatePrefixExpression(PrefixExpression.class.cast(e));
         } else if (e instanceof PostfixExpression) {
-            return generatePostfixExpression(PostfixExpression.class.cast(e));
+            return translatePostfixExpression(PostfixExpression.class.cast(e));
         } else if (e instanceof InfixExpression) {
-            return generateInfixExpression(InfixExpression.class.cast(e));
+            return translateInfixExpression(InfixExpression.class.cast(e));
         } else if (e instanceof VariableExpression) {
-            return generateVariableExpression(VariableExpression.class.cast(e));
+            return translateVariableExpression(VariableExpression.class.cast(e));
         } else {
             throw new RuntimeException("Unknown entity class: " + e.getClass().getName());
         }
     }
 
-    private String generatePrefixExpression(PrefixExpression e) {
+    private String translateStringLiteral(StringLiteral s) {
+        StringBuilder result = new StringBuilder("\"");
+        for (int codepoint: s.getValues()) {
+            if (isDisplayable(codepoint)) {
+                result.append((char)codepoint);
+            } else {
+                for (char c: Character.toChars(codepoint)) {
+                    result.append(String.format("\\u%04x", (int)c));
+                }
+            }
+        }
+        result.append("\"");
+        return result.toString();
+    }
+
+    private String translatePrefixExpression(PrefixExpression e) {
+        String op = e.getOp();
+        String operand = translateExpression(e.getOperand());
+        if ("!~-".indexOf(op) >= 0 || "++".equals(op) || "--".equals(op)) {
+            return String.format("%s%s", op, operand);
+        } else if ("string".equals(e.getOp())) {
+            return String.format("JSON.stringify(%s)", operand);
+        } else if ("length".equals(op)) {
+            return String.format("(%s).length", operand);
+        } else if ("int".equals(op) || "char".equals(op)) {
+            return operand;
+        } else {
+            throw new RuntimeException("Unknown prefix operator: " + e.getOp());
+        }
+    }
+
+    private String translatePostfixExpression(PostfixExpression e) {
+        String op = e.getOp();
+        String operand = translateExpression(e.getOperand());
+        if ("++".equals(op) || "--".equals(op)) {
+            return String.format("%s%s", operand, op);
+        } else {
+            throw new RuntimeException("Unknown postfix operator: " + e.getOp());
+        }
+    }
+
+    private String translateInfixExpression(InfixExpression e) {
+        // All Carlos binary operators look exactly the same as their JavaScript counterparts!
+        String left = translateExpression(e.getLeft());
+        String right = translateExpression(e.getRight());
+        return String.format("(%s %s %s)", left, e.getOp(), right);
+    }
+
+    private String translateEmptyArray(EmptyArray e) {
         return "NOT YET";
     }
 
-    private String generatePostfixExpression(PostfixExpression e) {
-        return "NOT YET";
+    private String translateArrayAggregate(ArrayAggregate e) {
+        List<String> expressions = new ArrayList<String>();
+        for (Expression arg : e.getArgs()) {
+            expressions.add(translateExpression(arg));
+        }
+        return "[" + Joiner.on(", ").join(expressions) + "]";
     }
 
-    private String generateInfixExpression(InfixExpression e) {
-        return "NOT YET";
+    private String translateStructAggregate(StructAggregate e) {
+        Iterator<StructField> fields = StructType.class.cast(e.getType()).getFields().iterator();
+        Iterator<Expression> values = e.getArgs().iterator();
+        List<String> pairs = new ArrayList<String>();
+        while (fields.hasNext() && values.hasNext()) {
+            pairs.add(property(fields.next().getName()) + ": " + translateExpression(values.next()));
+        }
+        return "{" + Joiner.on(", ").join(pairs) + "}";
     }
 
-    private String generateVariableExpression(VariableExpression e) {
-        return "NOT YET";
+    private String translateVariableExpression(VariableExpression v) {
+        if (v instanceof SimpleVariableReference) {
+            return variable(SimpleVariableReference.class.cast(v).getReferent());
+        } else if (v instanceof SubscriptedVariable) {
+            return translateSubscriptedVariable(SubscriptedVariable.class.cast(v));
+        } else if (v instanceof DottedVariable) {
+            return translateDottedVariable(DottedVariable.class.cast(v));
+        } else if (v instanceof CallExpression) {
+            return translateCallExpression(CallExpression.class.cast(v));
+        } else {
+            throw new RuntimeException("Unknown variable expression class: " + v.getClass().getName());
+        }
     }
 
-    private String generateExpressionList(List<Expression> list) {
-        return "NOT YET";
+    private String translateSubscriptedVariable(SubscriptedVariable v) {
+        String sequence = translateVariableExpression(v.getSequence());
+        String index = translateExpression(v.getIndex());
+        return String.format("%s[%s]", sequence, index);
     }
 
-    private String generateIdList(List<Variable> list) {
+    private String translateDottedVariable(DottedVariable v) {
+        String struct = translateVariableExpression(v.getStruct());
+        String fieldName = property(v.getFieldName());
+        return String.format("%s[%s]", struct, fieldName);
+    }
+
+    private String translateCallExpression(CallExpression e) {
+        return String.format("%s(%s)", variable(e.getFunction()), translateExpressionList(e.getArgs()));
+    }
+
+    private String translateExpressionList(List<Expression> list) {
+        List<String> expressions = new ArrayList<String>();
+        for (Expression e : list) {
+            expressions.add(translateExpression(e));
+        }
+        return Joiner.on(", ").join(expressions);
+    }
+
+    private String translateParameters(List<Variable> list) {
         List<String> names = new ArrayList<String>();
         for (Variable v : list) {
-            names.add(String.format("_v%d", v.getId()));
+            names.add(variable(v));
         }
         return Joiner.on(", ").join(names);
+    }
+
+    private String property(String s) {
+        StringBuilder result = new StringBuilder("\"");
+
+        // Both Java and JavaScript use UTF-16, so this is pretty easy
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (isDisplayable(c)) {
+                result.append(c);
+            } else {
+                result.append(String.format("\\u%04x", (int)c));
+            }
+        }
+        result.append("\"");
+        return result.toString();
+    }
+
+    private String variable(Entity e) {
+        return String.format("_v%d", e.getId());
+    }
+
+    /**
+     * Returns whether or not we should show a particular character in the JavaScript output.
+     * We only show characters we are guaranteed to see, that is, the non-control ASCII
+     * characters, except the double quote character itself, since we are always going to
+     * render string literals and property names inside double quotes.
+     */
+    private boolean isDisplayable(int c) {
+        return 20 <= c && c <= 126 && c != '"';
     }
 
     private void emit(String line, Object... args) {
