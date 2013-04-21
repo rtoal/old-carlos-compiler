@@ -3,6 +3,7 @@ package edu.lmu.cs.xlg.carlos;
 import static javax.swing.KeyStroke.getKeyStroke;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -34,19 +35,16 @@ import edu.lmu.cs.xlg.translators.CarlosToJavaScriptTranslator;
 import edu.lmu.cs.xlg.util.Log;
 
 /**
- * A simple GUI application for viewing the different things the Carlos
- * compiler can do.
+ * A simple GUI application for viewing the different things the Carlos compiler can do.
  *
- * The application has two panes.  The left is a simple text editor in
- * which one can edit a Carlos program, load one from the file system,
- * and save to the file system.  The right shows a view of the program
- * in response to a user selection action.  The user can choose to see
+ * The application has two panes.  The left is a simple text editor in which one can edit a Carlos
+ * program, load one from the file system, and save to the file system.  The right shows a view of
+ * the program in response to a user selection action.  The user can choose to see
  * <ul>
  *   <li>The abstract syntax tree
  *   <li>The semantic graph
+ *   <li>The optimzed semantic graph
  *   <li>A translation to JavaScript
- *   <li>A translation to C
- *   <li>A translation to Squid
  * </ul>
  */
 @SuppressWarnings("serial")
@@ -171,7 +169,6 @@ public class Viewer extends JFrame {
             view.setText("Nothing to save");
             return;
         }
-
         try {
             BufferedWriter out = new BufferedWriter(
                 new FileWriter(currentFile.getCanonicalPath()));
@@ -196,36 +193,46 @@ public class Viewer extends JFrame {
     }
 
     private void viewSyntaxTree() {
-        viewPane.setViewportView(view);
-        Program program = parse();
-        if (log.getErrorCount() > 0) {
-            view.setText(errors.toString());
-        } else {
-            StringWriter writer = new StringWriter();
-            program.printSyntaxTree("", "", new PrintWriter(writer));
-            view.setText(writer.toString());
+        try {
+            Program program = parse();
+            if (log.getErrorCount() > 0) {
+                displayErrorOutput();
+            } else {
+                StringWriter writer = new StringWriter();
+                program.printSyntaxTree("", "", new PrintWriter(writer));
+                displaySuccessfulOutput(writer);
+            }
+        } catch (Exception e) {
+            displayExceptionOutput(e);
         }
     }
 
     private void viewSemanticGraph() {
-        viewPane.setViewportView(view);
-        Program program = analyze();
-        if (log.getErrorCount() > 0) {
-            view.setText(errors.toString());
-        } else {
-            StringWriter writer = new StringWriter();
-            program.printEntities(new PrintWriter(writer));
-            view.setText(writer.toString());
+        try {
+            Program program = analyze();
+            if (log.getErrorCount() > 0) {
+                displayErrorOutput();
+            } else {
+                StringWriter writer = new StringWriter();
+                program.printEntities(new PrintWriter(writer));
+                displaySuccessfulOutput(writer);
+            }
+        } catch (Exception e) {
+            displayExceptionOutput(e);
         }
     }
 
     private void viewJavaScript() {
-        viewPane.setViewportView(view);
-        Program program = analyze();
-        if (log.getErrorCount() > 0) return;
-        StringWriter writer = new StringWriter();
-        new CarlosToJavaScriptTranslator().translateProgram(program, new PrintWriter(writer));
-        view.setText(writer.toString());
+        try {
+            StringWriter writer = toJavaScript();
+            if (log.getErrorCount() > 0) {
+                displayErrorOutput();
+            } else {
+                displaySuccessfulOutput(writer);
+            }
+        } catch (Exception e) {
+            displayExceptionOutput(e);
+        }
     }
 
     private Program parse() {
@@ -242,9 +249,31 @@ public class Viewer extends JFrame {
         return program;
     }
 
-    /**
-     * Runs the application.
-     */
+    private StringWriter toJavaScript() {
+        Program program = analyze();
+        if (log.getErrorCount() > 0) return null;
+        StringWriter writer = new StringWriter();
+        new CarlosToJavaScriptTranslator().translateProgram(program, new PrintWriter(writer));
+        return writer;
+    }
+
+    private void displaySuccessfulOutput(StringWriter writer) {
+        view.setBackground(Color.GREEN);
+        view.setText(writer.toString());
+    }
+
+    private void displayErrorOutput() {
+        view.setBackground(Color.ORANGE);
+        view.setText(errors.toString());
+    }
+
+    private void displayExceptionOutput(Exception e) {
+        view.setBackground(Color.RED);
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer));
+        view.setText(writer.toString());
+    }
+
     public static void main(String args[]) {
         new Viewer().setVisible(true);
     }
