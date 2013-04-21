@@ -239,6 +239,7 @@ Statement parseStmt(): {
     Expression e = null, e1 = null, e2 = null;
     Statement s = null;
     Block b = null;
+    Block elseBlock = null;
     Token i = null;
     String t = null;
     List<Expression> args = new ArrayList<Expression>();
@@ -270,10 +271,9 @@ Statement parseStmt(): {
         {cases.add(new Case(e, b));}
     )*
     (
-        "else" b = parseBlock()
-        {cases.add(new Case(BooleanLiteral.TRUE, b));}
+        "else" elseBlock = parseBlock()
     )?
-    {return new IfStatement(cases);}
+    {return new IfStatement(cases, elseBlock);}
 |
     "while" "(" e = parseExp() ")" b = parseBlock()
     {return new WhileStatement(e, b);}

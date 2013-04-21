@@ -9,9 +9,11 @@ import java.util.List;
 public class IfStatement extends Statement {
 
     private List<Case> cases;
+    private Block elsePart;
 
-    public IfStatement(List<Case> cases) {
+    public IfStatement(List<Case> cases, Block elsePart) {
         this.cases = cases;
+        this.elsePart = elsePart;
     }
 
     public IfStatement(Case c) {
@@ -22,10 +24,17 @@ public class IfStatement extends Statement {
         return cases;
     }
 
+    public Block getElsePart() {
+        return elsePart;
+    }
+
     @Override
     public void analyze(AnalysisContext context) {
         for (Case c: cases) {
             c.analyze(context);
+        }
+        if (elsePart != null) {
+            elsePart.analyze(context);
         }
     }
 }
