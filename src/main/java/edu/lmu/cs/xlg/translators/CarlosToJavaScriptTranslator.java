@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 
 import edu.lmu.cs.xlg.carlos.entities.ArrayAggregate;
 import edu.lmu.cs.xlg.carlos.entities.AssignmentStatement;
@@ -54,6 +55,14 @@ public class CarlosToJavaScriptTranslator {
     private PrintWriter writer;
     private int indentPadding = 4;
     private int indentLevel = 0;
+
+    private ImmutableMap<Function, String> builtIns = ImmutableMap.<Function, String>builder()
+        .put(Function.ATAN, "Math.atan2")
+        .put(Function.COS, "Math.cos")
+        .put(Function.LN, "Math.log")
+        .put(Function.SIN, "Math.sin")
+        .put(Function.SQRT, "Math.sqrt")
+        .build();
 
     public void translateProgram(Program program, PrintWriter writer) {
         this.writer = writer;
@@ -332,7 +341,24 @@ public class CarlosToJavaScriptTranslator {
     }
 
     private String translateCallExpression(CallExpression e) {
-        return String.format("%s(%s)", variable(e.getFunction()), translateExpressionList(e.getArgs()));
+
+        if (Function.PI.equals(e.getFunction())) {
+            return "Math.PI";
+        } else if (Function.SUBSTRING.equals(e.getFunction())) {
+            return String.format("(%s).substring(%s, %s)",
+                translateExpression(e.getArgs().get(0)),
+                translateExpression(e.getArgs().get(1)),
+                translateExpression(e.getArgs().get(2)));
+        } else if (Function.GET_STRING.equals(e.getFunction())) {
+            return "fs.readFileSync('/dev/stdin')";
+        }
+
+        String function = variable(e.getFunction());
+        String args = translateExpressionList(e.getArgs());
+        if (builtIns.containsKey(e.getFunction())) {
+            function = builtIns.get(e.getFunction());
+        }
+        return String.format("%s(%s)", function, args);
     }
 
     private String translateExpressionList(List<Expression> list) {
