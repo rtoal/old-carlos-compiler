@@ -190,9 +190,11 @@ public class CarlosToJavaScriptTranslator {
         }
         if (s.getElsePart() != null) {
             if (s.getCases().isEmpty()) {
+                // If and else-ifs were all optimized away!  Just do the else and get out.
                 for (Statement statement: s.getElsePart().getStatements()) {
                     translateStatement(statement);
                 }
+                return;
             } else {
                 emit("} else {");
                 translateBlock(s.getElsePart());
