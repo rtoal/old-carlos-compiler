@@ -9,9 +9,7 @@ import java.io.Reader;
 import edu.lmu.cs.xlg.carlos.entities.Entity.AnalysisContext;
 import edu.lmu.cs.xlg.carlos.entities.Program;
 import edu.lmu.cs.xlg.carlos.syntax.Parser;
-import edu.lmu.cs.xlg.squid.UserSubroutine;
 import edu.lmu.cs.xlg.translators.CarlosToJavaScriptTranslator;
-import edu.lmu.cs.xlg.translators.CarlosToSquidTranslator;
 import edu.lmu.cs.xlg.util.Log;
 
 /**
@@ -35,9 +33,7 @@ public class Compiler {
      * <pre>
      *   -syn: check syntax only
      *   -sem: check static semantics only
-     *   -c: translate to C
-     *   -js: translate to JavaScript
-     *   -q: translate to Squid
+     *   -js: translate to JavaScript (the default)
      * </pre>
      */
     public static void main(String[] args) throws IOException {
@@ -46,9 +42,9 @@ public class Compiler {
         String option;
         String baseFileName;
 
-        // Resolve command line arguments. If the option argument is missing, use "-exe" as a default.
+        // Resolve command line arguments. If the option argument is missing, use "-js" as a default.
         if (args.length == 1) {
-            option = "-exe";
+            option = "-js";
             baseFileName = args[0];
         } else if (args.length == 2) {
             option = args[0];
@@ -65,9 +61,6 @@ public class Compiler {
                 compiler.checkSyntax(reader);
             } else if (option.equals("-sem")) {
                 compiler.checkSemantics(reader);
-            } else if (option.equals("-q")) {
-                UserSubroutine main = compiler.generateQuads(reader);
-                main.dump(new PrintWriter(System.out, true));
             } else if (option.equals("-js")) {
                 compiler.generateJavaScript(reader, new PrintWriter(new FileWriter(baseFileName + ".js")));
             } else {
@@ -110,17 +103,6 @@ public class Compiler {
         log.message("checking_semantics");
         program.analyze(AnalysisContext.makeGlobalContext(log));
         return program;
-    }
-
-    /**
-     * Compiles a Carlos program into a Squid object.
-     */
-    public UserSubroutine generateQuads(Reader reader) throws IOException {
-        Program program = checkSemantics(reader);
-        if (log.getErrorCount() > 0) {
-            return null;
-        }
-        return new CarlosToSquidTranslator(4, 8).translateProgram(program);
     }
 
     /**

@@ -30,10 +30,7 @@ import javax.swing.JTextArea;
 import edu.lmu.cs.xlg.carlos.entities.Entity.AnalysisContext;
 import edu.lmu.cs.xlg.carlos.entities.Program;
 import edu.lmu.cs.xlg.carlos.syntax.Parser;
-import edu.lmu.cs.xlg.squid.Optimizer;
-import edu.lmu.cs.xlg.squid.UserSubroutine;
 import edu.lmu.cs.xlg.translators.CarlosToJavaScriptTranslator;
-import edu.lmu.cs.xlg.translators.CarlosToSquidTranslator;
 import edu.lmu.cs.xlg.util.Log;
 
 /**
@@ -117,14 +114,6 @@ public class Viewer extends JFrame {
             public void actionPerformed(ActionEvent e) {viewSemanticGraph();}
         };
 
-        Action quadsAction = new AbstractAction("Squid") {
-            public void actionPerformed(ActionEvent e) {viewQuads();}
-        };
-
-        Action optimizeAction = new AbstractAction("Optimize") {
-            public void actionPerformed(ActionEvent e) {viewOptimizedQuads();}
-        };
-
         Action javaScriptAction = new AbstractAction("JavaScript") {
             public void actionPerformed(ActionEvent e) {viewJavaScript();}
         };
@@ -135,7 +124,6 @@ public class Viewer extends JFrame {
         menuBar.add(new JButton(saveAsAction));
         menuBar.add(new JButton(syntaxAction));
         menuBar.add(new JButton(semanticsAction));
-        menuBar.add(new JButton(quadsAction));
         menuBar.add(new JButton(javaScriptAction));
         setJMenuBar(menuBar);
 
@@ -231,30 +219,6 @@ public class Viewer extends JFrame {
         }
     }
 
-    private void viewQuads() {
-        viewPane.setViewportView(view);
-        UserSubroutine main = translate();
-        if (log.getErrorCount() > 0) {
-            view.setText(errors.toString());
-        } else {
-            StringWriter writer = new StringWriter();
-            main.dump(new PrintWriter(writer));
-            view.setText(writer.toString());
-        }
-    }
-
-    private void viewOptimizedQuads() {
-        viewPane.setViewportView(view);
-        UserSubroutine main = optimize();
-        if (log.getErrorCount() > 0) {
-            view.setText(errors.toString());
-        } else {
-            StringWriter writer = new StringWriter();
-            main.dump(new PrintWriter(writer, true));
-            view.setText(writer.toString());
-        }
-    }
-
     private void viewJavaScript() {
         viewPane.setViewportView(view);
         Program program = analyze();
@@ -276,19 +240,6 @@ public class Viewer extends JFrame {
         if (log.getErrorCount() > 0) return null;
         program.analyze(AnalysisContext.makeGlobalContext(log));
         return program;
-    }
-
-    private UserSubroutine translate() {
-        Program program = analyze();
-        if (log.getErrorCount() > 0) return null;
-        return new CarlosToSquidTranslator(4, 8).translateProgram(program);
-    }
-
-    private UserSubroutine optimize() {
-        UserSubroutine main = translate();
-        if (log.getErrorCount() > 0) return null;
-        new Optimizer().optimizeSubroutine(main);
-        return main;
     }
 
     /**
