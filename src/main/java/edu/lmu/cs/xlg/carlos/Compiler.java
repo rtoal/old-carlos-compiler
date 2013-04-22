@@ -19,8 +19,10 @@ import edu.lmu.cs.xlg.util.Log;
  */
 public class Compiler {
 
-    // All output uses a custom logger reading from a property file of base name Carlos.
-    private Log log = new Log("Carlos", new PrintWriter(System.out, true));
+    /**
+     *  A custom logger that writes errors and messages from a property file of base name Carlos.
+     */
+    private Log log = new Log("Carlos", new PrintWriter(System.err, true));
 
     /**
      * Processes command line arguments and runs the compiler based on the arguments. The command
@@ -31,9 +33,10 @@ public class Compiler {
      * where &lt;basefilename&gt; is the name of the Carlos source file without the mandatory
      * <code>.carlos</code> extension. Option is:
      * <pre>
-     *   -syn: check syntax only
-     *   -sem: check static semantics only
-     *   -js: translate to JavaScript (the default)
+     *   -syn: check syntax only, writes to stdout.
+     *   -sem: check static semantics only, writes semantic graph to stdout.
+     *   -opt: stop after optimizing the semantic graph, writes to stdout.
+     *   -js: (the default) translate to JavaScript, writes to .js file.
      * </pre>
      */
     public static void main(String[] args) throws IOException {
@@ -58,9 +61,14 @@ public class Compiler {
         Reader reader = new FileReader(baseFileName);
         try {
             if (option.equals("-syn")) {
-                compiler.checkSyntax(reader);
+                Program program = compiler.checkSyntax(reader);
+                program.printSyntaxTree("", "", new PrintWriter(System.out, true));
             } else if (option.equals("-sem")) {
-                compiler.checkSemantics(reader);
+                Program program = compiler.checkSemantics(reader);
+                program.printEntities(new PrintWriter(System.out, true));
+            } else if (option.equals("-opt")) {
+                Program program = compiler.produceOptimizedSemanticGraph(reader);
+                program.printEntities(new PrintWriter(System.out, true));
             } else if (option.equals("-js")) {
                 compiler.generateJavaScript(reader, new PrintWriter(new FileWriter(baseFileName + ".js")));
             } else {
@@ -106,15 +114,29 @@ public class Compiler {
     }
 
     /**
-     * Compiles a Carlos program from a .carlos file into an assembly language program, writing
-     * the output to a .asm file.
+     * Does the whole front end given Carlos source code from a reader.
+     */
+    public Program produceOptimizedSemanticGraph(Reader reader) throws IOException {
+        Program program = checkSemantics(reader);
+        if (log.getErrorCount() > 0) {
+            return null;
+        }
+        log.message("optimizing");
+        program.optimize();
+        return program;
+    }
+
+    /**
+     * Compiles a Carlos program from a reader and writes the JavaScript to a writer.
      */
     public void generateJavaScript(Reader reader, PrintWriter writer) throws IOException {
-        Program program = checkSemantics(reader);
+        Program program = produceOptimizedSemanticGraph(reader);
         if (log.getErrorCount() > 0) {
             return;
         }
+        log.message("writing");
         new CarlosToJavaScriptTranslator().translateProgram(program, writer);
+        writer.close();
     }
 
     /**
