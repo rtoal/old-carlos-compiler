@@ -49,21 +49,19 @@ import edu.lmu.cs.xlg.util.Log;
  *          StringLiteral
  *       VariableExpression
  *          SimpleVariableReference
- *          CallExpression
  *          SubscriptedVariable
  *          DottedVariable
+ *          CallExpression
+ *       ArrayAggregate
  *       StructAggregate
- *       EmptyArray
  *       PrefixExpression
  *       PostfixExpression
  *       InfixExpression
  *
- * Each concrete entity class has a constructor to fill in the "syntactic"
- * part of the entity.  For example, we know the name of a variable reference
- * while generating the abstract syntax tree, so that is filled in by
- * the constructor.  However, we don't know until semantic analysis exactly
- * which variable is being referred to, so that field is not filled in
- * by the constructor.
+ * Each concrete entity class has a constructor to fill in the "syntactic" part of the entity.
+ * For example, we know the name of a variable reference while generating the abstract syntax
+ * tree, so that is filled in by the constructor.  However, we don't know until semantic analysis
+ * exactly which variable is being referred to, so that field is not filled in by the constructor.
  */
 public abstract class Entity {
 
@@ -105,8 +103,9 @@ public abstract class Entity {
     public final void printSyntaxTree(String indent, String prefix, PrintWriter out) {
 
         // Prepare the line to be written
-        String className = getClass().getName();
-        String line = indent + prefix + className.substring(className.lastIndexOf('.') + 1);
+        String classname = getClass().getName();
+        String kind = classname.substring(classname.lastIndexOf('.') + 1);
+        String line = indent + prefix + "(" + kind + ")";
 
         // Process the fields, adding plain attributes to the line, but storing all the entity
         // children in a linked hash map to be processed after the line is written.  We use a
@@ -127,11 +126,11 @@ public abstract class Entity {
                     }
                 } catch (ClassCastException cce) {
                     // Special case for non-entity collections
-                    line += " " + name + "=\"" + value + "\"";
+                    line += " " + name + "=" + value;
                 }
             } else {
                 // Simple attribute, attach description to node name
-                line += " " + name + "=\"" + value + "\"";
+                line += " " + name + "=" + value;
             }
         }
         out.println(line);
