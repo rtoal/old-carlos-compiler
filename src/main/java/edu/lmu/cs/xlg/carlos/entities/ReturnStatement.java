@@ -41,7 +41,9 @@ public class ReturnStatement extends Statement {
 
     @Override
     public Statement optimize() {
-        returnExpression = returnExpression.optimize();
+        if (returnExpression != null) {
+            returnExpression = returnExpression.optimize();
+        }
         return this;
     }
 }
