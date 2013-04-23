@@ -45,7 +45,7 @@ public class ArrayAggregate extends Expression {
         Type elementType = ArrayType.class.cast(type).getBaseType();
         for (Expression a: args) {
             a.analyze(context);
-            a.assertAssignableTo(elementType, context, "array_aggregate");
+            a.assertAssignableTo(elementType, "array_aggregate_type_mismatch", context);
         }
     }
 }

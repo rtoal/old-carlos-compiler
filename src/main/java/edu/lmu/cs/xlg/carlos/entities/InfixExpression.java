@@ -70,8 +70,8 @@ public class InfixExpression extends Expression {
         // bool && bool
         // bool || bool
         } else if (op.matches("&&|\\|\\|")) {
-            left.assertBoolean(op, context);
-            right.assertBoolean(op, context);
+            left.assertBoolean("logical_operand_not_boolean", context);
+            right.assertBoolean("logical_operand_not_boolean", context);
             type = Type.BOOLEAN;
         }
     }

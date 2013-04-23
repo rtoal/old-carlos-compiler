@@ -50,7 +50,7 @@ public class StructAggregate extends Expression {
             Expression a = ai.next();
             StructField f = fi.next();
             a.analyze(context);
-            a.assertAssignableTo(f.getType(), context, "struct_aggregate");
+            a.assertAssignableTo(f.getType(), "struct_aggregate_type_mismatch", context);
         }
     }
 }

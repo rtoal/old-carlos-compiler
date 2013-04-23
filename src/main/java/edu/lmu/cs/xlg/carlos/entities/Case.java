@@ -24,7 +24,7 @@ public class Case extends Entity {
     @Override
     public void analyze(AnalysisContext context) {
         condition.analyze(context);
-        condition.assertBoolean("if_statement_condition", context);
+        condition.assertBoolean("if_condition_not_boolean", context);
         body.analyze(context);
     }
 

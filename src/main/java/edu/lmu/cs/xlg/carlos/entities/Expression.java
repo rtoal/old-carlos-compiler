@@ -28,9 +28,9 @@ public abstract class Expression extends Entity {
     // Helpers for semantic analysis, called from the analyze methods of other expressions.  These
     // are by no means necessary, but they are very convenient.
 
-    void assertAssignableTo(Type otherType, AnalysisContext context, String construct) {
+    void assertAssignableTo(Type otherType, String resourceKey, AnalysisContext context) {
         if (!this.isCompatibleWith(otherType)) {
-            context.error("type_mismatch", construct, otherType.getName(), this.type.getName());
+            context.error(resourceKey, otherType.getName(), this.type.getName());
         }
     }
 
@@ -46,9 +46,9 @@ public abstract class Expression extends Entity {
         }
     }
 
-    void assertBoolean(String operator, AnalysisContext context) {
+    void assertBoolean(String resourceKey, AnalysisContext context) {
         if (!(type == Type.BOOLEAN)) {
-            context.error("non_boolean", operator);
+            context.error(resourceKey);
         }
     }
 

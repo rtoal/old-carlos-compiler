@@ -73,7 +73,7 @@ public class ClassicForStatement extends Statement {
         // The second part must be a boolean expression.
         if (test != null) {
             test.analyze(context);
-            test.assertBoolean("for", context);
+            test.assertBoolean("for_loop_termination_not_boolean", context);
         }
 
         // No constraints on the third part.

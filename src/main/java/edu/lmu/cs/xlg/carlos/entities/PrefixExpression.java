@@ -26,7 +26,7 @@ public class PrefixExpression extends Expression {
         operand.analyze(context);
 
         if ("!".equals(op)) {
-            operand.assertBoolean(op, context);
+            operand.assertBoolean("boolean_operand_expected_for_not", context);
             type = Type.BOOLEAN;
 
         } else if ("-".equals(op)) {
