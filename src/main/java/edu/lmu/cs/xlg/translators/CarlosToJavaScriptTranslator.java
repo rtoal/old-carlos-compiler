@@ -150,7 +150,7 @@ public class CarlosToJavaScriptTranslator {
     }
 
     private void translateFunctionDeclaration(Function f) {
-        emit("var %s = function (%s) {", variable(f), translateParameters(f.getParameters()));
+        emit("function %s(%s) {", variable(f), translateParameters(f.getParameters()));
         translateBlock(f.getBody());
         emit("}");
     }
@@ -314,7 +314,7 @@ public class CarlosToJavaScriptTranslator {
     }
 
     private String translateEmptyArray(EmptyArray e) {
-        return "NOT YET";
+        return String.format("Array()", translateExpression(e.getBound()));
     }
 
     private String translateArrayAggregate(ArrayAggregate e) {

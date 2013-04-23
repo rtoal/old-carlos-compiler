@@ -52,6 +52,7 @@ import edu.lmu.cs.xlg.util.Log;
  *          SubscriptedVariable
  *          DottedVariable
  *          CallExpression
+ *       EmptyArray
  *       ArrayAggregate
  *       StructAggregate
  *       PrefixExpression
